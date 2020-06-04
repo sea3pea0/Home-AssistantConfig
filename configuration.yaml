@@ -17,7 +17,6 @@ frontend:
 
 
 http:
-  # base_url: !secret base_url
   use_x_forwarded_for: true
   trusted_proxies: 
     - !secret hass_ip
@@ -84,11 +83,6 @@ device_tracker:
   #   password: !secret trac_pass
   #   port: 8072
 
-  # - platform: snmp
-  #   host: 192.168.1.1
-  #   community: peapalace
-  #   baseoid: 1.3.6.1.2.1.4.22.1.2
-
 weather:
   - platform: darksky
     api_key: !secret dark_sky_api
@@ -118,9 +112,6 @@ media_player:
 
 logger:
   default: info
-
-# apcupsd:
-#   host: a722577e-apcupsd
 
 system_health:
 
