@@ -1,0 +1,192 @@
+homeassistant:
+
+  customize: !include customize.yaml
+  packages: !include_dir_named packages
+  
+  auth_providers:
+
+    - type: homeassistant
+
+  whitelist_external_dirs:
+    - /tmp
+    - /share/scripts
+    - /share/camera
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+
+http:
+  # base_url: !secret base_url
+  use_x_forwarded_for: true
+  trusted_proxies: 
+    - !secret hass_ip
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+
+
+updater:
+  include_used_components: true
+
+discovery:
+
+conversation:
+
+history:
+
+sun:
+
+tts:
+  - platform: google_translate
+    cache: true
+    cache_dir: /tmp/tts
+    time_memory: 300
+    base_url: !secret base_url
+    service_name: google_say
+
+cloud:
+
+# Included Files:
+emulated_hue: !include emulated_hue.yaml
+alert: !include alert.yaml
+light: !include light.yaml
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+sensor: !include sensor.yaml
+binary_sensor: !include binary_sensor.yaml       
+switch: !include switch.yaml
+# shell_command: !include shell_command.yaml
+input_select: !include input_select.yaml
+# input_number: !include input_number.yaml
+input_boolean: !include input_boolean.yaml
+zone: !include zone.yaml
+scene: !include scenes.yaml
+# rest_command: !include rest_command.yaml
+# input_text: !include input_text.yaml
+
+# ios:
+
+hassio:
+
+remote:
+  - platform: harmony
+    name: main
+    host: !secret harmony_ip
+
+device_tracker:
+
+  - platform: bluetooth_tracker
+
+  # - platform: traccar
+  #   host: !secret hass_ip
+  #   username: !secret email
+  #   password: !secret trac_pass
+  #   port: 8072
+
+  # - platform: snmp
+  #   host: 192.168.1.1
+  #   community: peapalace
+  #   baseoid: 1.3.6.1.2.1.4.22.1.2
+
+weather:
+  - platform: darksky
+    api_key: !secret dark_sky_api
+    mode: daily
+
+media_player:
+
+  - platform: androidtv
+    host: !secret shield_ip
+    name: "NVidia Shield"
+    adb_server_ip: 127.0.0.1
+    adb_server_port: !secret adb_port
+
+  - platform: androidtv
+    host: !secret bedroom_firestick_ip
+    device_class: firetv
+    name: "Bedroom FireTV"
+    adb_server_ip: 127.0.0.1
+    adb_server_port: !secret adb_port
+
+  - platform: androidtv
+    host: !secret patio_firestick_ip
+    device_class: firetv
+    name: "Patio FireTV"
+    adb_server_ip: 127.0.0.1
+    adb_server_port: !secret adb_port
+
+logger:
+  default: info
+
+# apcupsd:
+#   host: a722577e-apcupsd
+
+system_health:
+
+person:
+
+notify:
+
+  - platform: html5
+    name: html5
+    vapid_pub_key: !secret vapid_pubkey
+    vapid_prv_key: !secret vapid_privkey
+    vapid_email: !secret email
+
+  - platform: nfandroidtv
+    name: Shield Living Room
+    host: !secret shield_ip
+
+  # - platform: nfandroidtv
+  #   name: FireTV Stick Patio
+  #   host: !secret patio_firestick_ip
+
+  # - platform: nfandroidtv
+  #   name: FireTV Stick Bedroom
+  #   host: !secret bedroom_firestick_ip
+
+  - name: telegram
+    platform: telegram
+    chat_id: !secret group1
+
+stream:
+
+camera:
+
+system_log:
+  fire_event: true
+
+python_script:
+
+hacs:
+  token: !secret hacs_github_token
+  appdaemon: true
+  options:
+    country: US
+    experimental: true
+
+zeroconf:
+
+lovelace:
+  mode: yaml
+  resources:
+    - type: module
+      url: /hacsfiles/weather-card/weather-card.js
+    - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
+      type: module
+    - url: /hacsfiles/air-visual-card/air-visual-card.js
+      type: module
+
+geo_location:
+  - platform: usgs_earthquakes_feed
+    feed_type: 'past_month_m45_earthquakes'
+    radius: 100
+
+config:
+
+mobile_app:
+
+map:
+
+ssdp:

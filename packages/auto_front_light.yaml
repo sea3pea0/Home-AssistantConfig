@@ -1,0 +1,60 @@
+# Automations
+
+automation:
+
+# Automatically turn OFF Front light based on time & sensor input_boolean
+
+  - alias: Front Light Off
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.front_pir
+        to: 'off'
+        for: '00:07:00'
+      - platform: state
+        entity_id: binary_sensor.front_patio_pir
+        to: 'off'
+        for: '00:07:00'
+      - platform: state
+        entity_id: binary_sensor.front_porch_person
+        to: 'off'
+        for: '00:07:00'
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: 'off'
+        for: '00:07:00'
+    condition:
+      - condition: state
+        entity_id: light.front
+        state: 'on'
+    action:
+      - service: light.turn_off
+        entity_id: light.front
+
+# Automatically turn ON Front light based on time & sensor input_boolean
+
+  - alias: Light Front Auto On 10 When Dark
+    trigger:
+      - platform: state
+        entity_id: person.cp
+        to: 'home'
+      - platform: state
+        entity_id: person.yulia
+        to: 'home'
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.front_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.front_person_detected
+        to: 'on'
+    condition:
+      condition: numeric_state
+      entity_id: sensor.front_luminance
+      below: 40
+    action:
+      - service: light.turn_on
+        entity_id: light.front
+        data:
+          brightness: 255

@@ -1,0 +1,6 @@
+people:
+  # control: hidden
+  name: People
+  entities:
+    - !secret person_1
+    - !secret person_2

@@ -1,0 +1,466 @@
+alarm_control_panel:
+  - platform: manual
+    name: Alarm
+    code: !secret alarm_code
+
+camera:
+
+  # Front Porch Camera
+  - platform: generic
+    name: Front Porch
+    still_image_url: !secret front_porch_still_url
+    stream_source: !secret front_porch_stream_url
+
+  # Front Porch - Local File Camera for Imagae Processing
+  - platform: local_file
+    file_path: /share/camera/front.jpg
+    name: Front Porch Motion
+
+input_boolean:
+
+  # Front Porch Camera Boolean Switches as inputs for corresponding binary_senors
+  front_porch_camera_motion:
+    name: Front Porch Camera Motion
+  front_porch_person:
+    name: Front Porch Person Detected
+
+input_text:
+
+  # Store Entity ID Responsible for Alarm Trigger
+  alarm_trigger:
+    name: Alarm Trigger
+    initial: None
+  front_porch_image_filepath:
+    name: Front Porch Image File Path
+  front_porch_image_timestamp:
+    name: Front Porch Image Timestamp
+
+group:
+
+  # A group of binary_sensors used to determine if the home perimeter is secure
+  home_not_secure:
+    # control: hidden
+    name: Home Secure
+    entities:
+      - binary_sensor.back_door
+      - binary_sensor.front_door
+      - binary_sensor.main_front_window
+      - binary_sensor.main_side_window
+      - binary_sensor.kitchen_window
+      - binary_sensor.office_window
+      - binary_sensor.bathroom_window
+      - binary_sensor.bedroom_window
+
+folder_watcher:
+
+  # Watch Camera Folder for jpeg files
+  - folder: /share/camera
+    patterns:
+      - '*.jpg'
+
+binary_sensor:
+
+  - platform: template
+    sensors:
+
+    # Front Porch Camera - binary_sensors receive input from input_booleans defined in this file
+      front_porch_person:
+        friendly_name: Front Porch - Person Detected
+        value_template: "{{is_state('input_boolean.front_porch_person', 'on')}}"
+        device_class: motion
+      front_porch_camera_motion:
+        friendly_name: Front Porch Camera Motion
+        value_template: "{{is_state('input_boolean.front_porch_camera_motion', 'on')}}"
+        device_class: motion
+
+
+
+image_processing:
+
+  # Front Porch Camera
+  - platform: tensorflow
+    scan_interval: 10000
+    confidence: 98
+    source:
+      - entity_id: camera.front_porch_motion
+    model:
+      graph: /config/tensorflow/frozen_inference_graph.pb
+      categories:
+        - person
+
+automation:
+
+  # Front Porch Camera Motion - Trigger Person Detection
+  - alias: Front Porch Camera Motion - Trigger Person Detection
+    initial_state: 'on'
+    trigger:
+      platform: event
+      event_type: folder_watcher
+      event_data:
+        event_type: created
+    condition:
+      - condition: template
+        value_template: "{{'.jpg' in trigger.event.data.file and 'front_porch' in trigger.event.data.path }}"
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.front_porch_camera_motion
+      - service: local_file.update_file_path
+        data_template:
+          entity_id: camera.front_porch_motion
+          file_path: "{{ trigger.event.data.path }}"
+      - wait_template: "{{ state_attr('camera.front_porch_motion', 'file_path') == trigger.event.data.path }}"
+        timeout: '00:00:08'
+        continue_on_timeout: 'false'
+      - service: image_processing.scan
+        entity_id: image_processing.tensorflow_front_porch_motion
+      - delay: '00:00:01'
+      - condition: numeric_state
+        entity_id: image_processing.tensorflow_front_porch_motion
+        above: 0
+      # - condition: state
+      #   entity_id: group.people
+      #   state: 'not_home'
+      # - service: input_boolean.turn_on
+      #   entity_id: "input_boolean.front_porch_person"
+      # - condition: state
+      #   entity_id: input_boolean.notifications
+      #   state: 'on'
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_image_timestamp
+          value: "{{ trigger.event.time_fired|as_timestamp()|timestamp_custom('%H:%M:%S') }}"
+      - service: automation.turn_off
+        entity_id: automation.front_porch_camera_motion_trigger_person_detection
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_image_filepath
+          value: "{{ trigger.event.data.path }}"
+      - service: input_boolean.turn_on
+        entity_id: "input_boolean.front_porch_person"
+      # Telegram Notification
+      # - service: telegram_bot.send_photo
+      #   data_template:
+      #     file: "{{ trigger.event.data.path }}"
+      #     caption: "🚶‍♂️ {{ trigger.event.time_fired|as_timestamp()|timestamp_custom('%H:%M:%S') }} 📸 Front Porch"
+      #     target: !secret group1
+      #     timeout: 30
+      # Signal Notification
+      # - service: notify.signal
+      #   data_template:
+      #     message: "🚶‍♂️ {{ trigger.event.time_fired|as_timestamp()|timestamp_custom('%H:%M:%S') }} 📸 Front Porch"
+      #     data:
+      #       attachments:
+      #         - "{{ trigger.event.data.path }}"
+      # Shield Notification
+
+  - alias: Front Porch Telegram Alert - Night
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: time
+          after: '19:00:00'
+          before: '08:00:00'
+    action:
+      - service: telegram_bot.send_photo
+        data_template:
+          file: "{{ states('input_text.front_porch_image_filepath') }}"
+          caption: "🚶‍♂️ {{ states('input_text.front_porch_image_timestamp') }} 📸 Front Porch"
+          target: !secret group1
+          timeout: 30
+
+  - alias: Front Porch Telegram Alert - Day Away
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: state
+          entity_id: group.people
+          state: 'not_home'
+        - condition: time
+          after: '08:00:00'
+          before: '19:00:00'
+    action:
+      - service: telegram_bot.send_photo
+        data_template:
+          file: "{{ states('input_text.front_porch_image_filepath') }}"
+          caption: "🚶‍♂️ {{ states('input_text.front_porch_image_timestamp') }} 📸 Front Porch"
+          target: !secret group1
+          timeout: 30
+
+  - alias: Front Porch Shield Alert
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: state
+          entity_id: group.people
+          state: 'home'
+        - condition: state
+          entity_id: binary_sensor.main_tv
+          state: 'on'
+    action:
+      - service: notify.shield_living_room
+        data_template:
+          message: "🚶‍♂️ Person Detected in Front"
+          data:
+            color: black
+            position: top-right
+            fontsize: small
+            duration: 20
+            # interrupt: true
+            transparency: 0%
+            file:
+              path: "{{ states('input_text.front_porch_image_filepath') }}"
+
+  - alias: Front Porch Camera Motion Timer
+    trigger:
+      platform: state
+      entity_id: input_boolean.front_porch_camera_motion
+      to: 'on'
+    action:
+      - delay: '00:00:09'
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_motion
+
+  - alias: Front Porch Person Timer
+    trigger:
+      platform: state
+      entity_id: input_boolean.front_porch_person
+      to: 'on'
+    action:
+      - delay: '00:00:09'
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_person
+      - service: automation.turn_on
+        entity_id: automation.front_porch_camera_motion_trigger_person_detection
+
+  # Image Folder Cleanup
+  - alias: Clean Image Folders
+    trigger:
+      platform: time_pattern
+      hours: '/4'
+    action:
+      - service: shell_command.delete_old_images
+      - delay: '00:01:00'
+      - service: shell_command.delete_empty_folders
+
+  # Alarm Trigger
+  - alias: 'Alarm Trigger'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.back_door
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bathroom_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bedroom_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.kitchen_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.main_front_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.main_side_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.office_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bathroom_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bedroom_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.hallway_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: alarm_control_panel.alarm
+        state: armed_away
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.alarm_trigger
+        data_template:
+          entity_id: input_text.alarm_trigger
+          value: "{{ trigger.entity_id }}"
+      - service: alarm_control_panel.alarm_trigger
+        entity_id: alarm_control_panel.alarm
+
+  # Alarm Activate - Turn On Sirens & Lights
+  - alias: 'Alarm Activate - Siren & Light'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'triggered'
+    action:
+      - service: switch.turn_on
+        entity_id: switch.main_siren
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.police_effect
+  - alias: 'Alarm Disarm/Deactivate - Siren & Light'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'disarmed'
+    action:
+      - service: switch.turn_off
+        entity_id: switch.main_siren
+      - service: light.turn_off
+        entity_id: light.main
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'none'
+
+  # Alarm Disarm - People Arriving
+  - alias: People Arrive - Disarm Alarm
+    trigger:
+      - platform: state
+        entity_id: !secret person_1
+        to: "home"
+        for: '00:00:35'
+      - platform: state
+        entity_id: !secret person_2
+        to: "home"
+        for: '00:00:35'
+    condition:
+      - condition: state
+        entity_id: alarm_control_panel.alarm
+        state:  'armed_away'
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.alarm
+          code: !secret alarm_code
+
+  # Away Mode
+  - alias: Away Mode Settings
+    trigger:
+      - platform: state
+        entity_id: group.people
+        to: "not_home"
+    action:
+      # - service: switch.turn_off
+      #   entity_id: switch.home_mode
+      - service: switch.turn_off
+        entity_id: switch.fan
+      - service: homeassistant.turn_off
+        entity_id: group.all_lights
+      - service: climate.turn_off
+        entity_id: climate.thermostat_hallway_mode
+
+  # Home Mode
+  # - alias: Home Mode
+  #   trigger:
+  #     - platform: state
+  #       entity_id: group.people
+  #       to: "home"
+  #   action:
+  #     - service: switch.turn_on
+  #       entity_id: switch.home_mode
+
+  # Start Synology Manual Recording when Person Detected and also record a video clip in Home Assistant
+  # - alias: Front Camera Record Start
+  #   trigger:
+  #     platform: template
+  #     value_template: "{{'person' in state_attr('image_processing.tensorflow_front_porch_motion', 'matches')}}"
+  #   action:
+  #     - service: switch.turn_on
+  #       entity_id: switch.front_cam_record
+
+  # Stop Synology Manual Recording when no motion detected
+  # - alias: Front Camera Record Stop
+  #   trigger:
+  #     - platform: state
+  #       entity_id: input_boolean.front_porch_camera_motion
+  #       to: 'off'
+  #       for: 00:00:25
+  #     - platform: state
+  #       entity_id: binary_sensor.front_pir
+  #       to: 'off'
+  #       for: 00:00:25
+  #   condition:
+  #     condition: and
+  #     conditions:
+  #       - condition: state
+  #         entity_id: input_boolean.front_porch_camera_motion
+  #         state: 'off'
+  #         for: '00:00:25'
+  #       - condition: state
+  #         entity_id: binary_sensor.front_pir
+  #         state: 'off'
+  #         for: '00:00:25'
+  #   action:
+  #     - service: switch.turn_off
+  #       entity_id: switch.front_cam_record
+
+shell_command:
+
+  # Image Folder Cleanup Commands
+  delete_old_images: find /share/camera/* -mindepth 4 -mmin +240 -exec rm {} \;
+  delete_empty_folders: find /share/camera -mindepth 2 -type d -exec rmdir {} \;
+
+# switch:
+
+  # Synology Home/Away Mode Switch - Relies on script placed in /share/scripts
+  # - platform: command_line
+  #   switches:
+  #     home_mode:
+  #       command_on: !secret shell_ss_home_on
+  #       command_off: !secret shell_ss_home_off
+  #       command_state: !secret shell_ss_home_status
+  #       value_template: >
+  #         {% if value_json is defined %}
+  #           {{ value_json.data.on}}
+  #         {% else %}
+  #           {{ states.switch.home_mode.state == 'on' }}
+  #         {% endif %}
+  #       friendly_name: Home Mode
+
+  # Synology Manual Record Switch for Cameras - Relies on script placed in /share/scripts
+  # - platform: command_line
+  #   switches:
+  #     front_cam_record:
+  #       command_on: !secret shell_front_cam_record_start
+  #       command_off: !secret shell_front_cam_record_stop
+  #       command_state: !secret shell_front_cam_record_status
+  #       value_template: >
+  #         {% if value_json.data.cameras[0].recStatus == 6 %}
+  #           true
+  #         {% else %}
+  #           false
+  #         {% endif %}
+  #       friendly_name: Front Camera Recording

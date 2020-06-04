@@ -1,0 +1,143 @@
+binary_sensor.back_door:
+  device_class: door
+switch.bedroom_closet:
+  icon: mdi:led-strip
+binary_sensor.bedroom_closet_pir:
+  device_class: motion
+binary_sensor.front_door:
+  device_class: door
+sensor.main_humidity:
+  device_class: humidity
+sensor.main_luminance:
+  device_class: illuminance
+sensor.main_temperature:
+  device_class: temperature
+light.main_rgb:
+  icon: mdi:led-strip
+switch.bedroom_tv:
+  icon: mdi:television
+switch.main_tv:
+  friendly_name: TV
+  icon: mdi:television
+sensor.plex:
+  icon: mdi:plex
+binary_sensor.back_pir:
+  device_class: motion
+binary_sensor.bathroom_pir:
+  device_class: motion
+binary_sensor.bedroom_pir:
+  device_class: motion
+binary_sensor.hallway_pir:
+  device_class: motion
+binary_sensor.main_pir:
+  device_class: motion
+binary_sensor.front_pir:
+  device_class: motion
+binary_sensor.laundry_pir:
+  device_class: motion
+sensor.average_temperature:
+  friendly_name: Temperature
+sensor.average_humidity:
+  friendly_name: Humidity
+sensor.sunrise:
+  icon: mdi:weather-sunset-up
+sensor.sunset:
+  icon: mdi:weather-sunset-down
+switch.bedroom_siren:
+  icon: mdi:bell-ring
+binary_sensor.front_motion_detected:
+  friendly_name: Front Camera
+sensor.daylight:
+  icon: mdi:weather-sunset
+sensor.front_luminance:
+  device_class: illuminance
+sensor.back_luminance:
+  device_class: illuminance
+sensor.luminance:
+  friendly_name: Main
+  unit_of_measurement: lux
+light.main:
+  icon: mdi:led-strip
+sensor.carbon_dioxide:
+  friendly_name: CO2
+sensor.ups_battery:
+  friendly_name: Local UPS
+sensor.nut_battery_charge:
+  friendly_name: NAS UPS
+  icon: mdi:battery
+sensor.ups_status:
+  friendly_name: Local UPS
+sensor.nut_status:
+  friendly_name: NAS UPS
+group.main_rgbw:
+  icon: mdi:led-strip
+group.cp:
+  entity_picture: !secret user_1_picture
+group.yulia:
+  entity_picture: !secret user_2_picture
+group.seaprius:
+  entity_picture: /local/seaprius.png
+group.people:
+  icon: mdi:account-multiple
+device_tracker.leyah_pixel2xl:
+  name: Pixel 2 XL GPS
+  picture: !secret user_2_picture
+device_tracker.sea3pea0_pixel3a:
+  name: Pixel 3a GPS
+  picture: !secret user_1_picture
+person.cp:
+  entity_picture: !secret user_1_picture
+person.yulia:
+  entity_picture: !secret user_2_picture
+binary_sensor.patio_pir:
+  device_class: motion
+switch.main_fan:
+  device_class: switch
+  icon: mdi:fan
+sensor.bedroom_closet_luminance:
+  device_class: illuminance
+automation.bedroom_closet_motion: {}
+switch.front_cam_record:
+  icon: mdi:cctv
+switch.synology_home_mode:
+  icon: mdi:home-account
+switch.home_mode:
+  icon: mdi:home-account
+switch.main_receiver:
+  icon: mdi:audio-video
+light.main_ambience:
+  icon: mdi:led-strip
+switch.coffee_switch:
+  icon: mdi:coffee
+switch.fan:
+  icon: mdi:fan
+binary_sensor.bathroom_window:
+  device_class: window
+binary_sensor.kitchen_window:
+  device_class: window
+binary_sensor.main_front_window:
+  device_class: window
+binary_sensor.main_side_window:
+  device_class: window
+binary_sensor.office_window:
+  device_class: window
+binary_sensor.bedroom_window:
+  device_class: window
+switch.main_siren:
+  icon: mdi:bell
+device_tracker.pixel_3a:
+  picture: !secret user_1_picture
+device_tracker.pixel_2_xl:
+  picture: !secret user_2_picture
+switch.coffee_machine_switch:
+  icon: mdi:coffee
+sensor.pixel_2_xl_wifi_connection:
+  picture: !secret user_2_picture
+device_tracker.pixel_2xl_wifi:
+  entity_picture: !secret user_2_picture
+device_tracker.pixel_3a_wifi:
+  entity_picture: !secret user_2_picture
+device_tracker.pixel_3a_gps:
+  entity_picture: !secret user_1_picture
+device_tracker.pixel_2xl_gps:
+  entity_picture: !secret user_2_picture

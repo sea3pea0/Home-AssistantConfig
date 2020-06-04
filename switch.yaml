@@ -1,0 +1,23 @@
+  - platform: template
+    switches:
+      main_shield_tv:
+        value_template: "{{ 'SHIELD TV' in state_attr('remote.main','current_activity') }}"
+        turn_on:
+          service: remote.turn_on
+          data:
+            entity_id: remote.main
+            activity: "SHIELD TV"
+        turn_off:
+          service: remote.turn_off
+          data:
+            entity_id: remote.main
+  - platform: command_line
+    switches:
+      aeotec_zstick_disco_light:
+        friendly_name: 'Aeotec Z-Stick Disco Light'
+        command_on: !secret disco_on
+        command_off: !secret disco_off
+      unifi_ap_light:
+        friendly_name: 'Unifi AP Light'
+        command_on: !secret unifi_led_on
+        command_off: !secret unifi_led_off

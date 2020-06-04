@@ -1,0 +1,204 @@
+  main_pir_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Main PIR ({{ states('sensor.main_pir_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Main PIR ({{ states('sensor.main_pir_battery') }}%)"
+    entity_id: binary_sensor.main_pir_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  bedroom_pir_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Bedroom PIR ({{ states('sensor.bedroom_pir_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Bedroom PIR ({{ states('sensor.bedroom_pir_battery') }}%)"
+    entity_id: binary_sensor.bedroom_pir_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  hallway_pir_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Hallway PIR ({{ states('sensor.hallway_pir_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Hallway PIR ({{ states('sensor.hallway_pir_battery') }}%)"
+    entity_id: binary_sensor.hallway_pir_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  bathroom_pir_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Bathroom PIR ({{ states('sensor.bathroom_pir_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Bathroom PIR ({{ states('sensor.bathroom_pir_battery') }}%)"
+    entity_id: binary_sensor.bathroom_pir_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  laundry_pir_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Laundry PIR ({{ states('sensor.laundry_pir_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Laundry PIR ({{ states('sensor.laundry_pir_battery') }}%)"
+    entity_id: binary_sensor.laundry_pir_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  front_multi_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Front Multi ({{ states('sensor.front_multi_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Front Multi ({{ states('sensor.front_multi_battery') }}%)"
+    entity_id: binary_sensor.front_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  patio_multi_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Patio Multi ({{ states('sensor.patio_multi_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Patio Multi ({{ states('sensor.patio_multi_battery') }}%)"
+    entity_id: binary_sensor.patio_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  back_multi_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Back Multi ({{ states('sensor.back_multi_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Back Multi ({{ states('sensor.back_multi_battery') }}%)"
+    entity_id: binary_sensor.back_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  bedroom_closet_multi_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Bedroom Closet Multi ({{ states('sensor.bedroom_closet_multi_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Bedroom Closet Multi ({{ states('sensor.bedroom_closet_multi_battery') }}%)"
+    entity_id: binary_sensor.bedroom_closet_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  kitchen_multi_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Kitchen Multi ({{ states('sensor.kitchen_multi_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Kitchen Multi ({{ states('sensor.kitchen_multi_battery') }}%)"
+    entity_id: binary_sensor.kitchen_closet_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  main_side_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Main Front Window ({{ states('sensor.main_side_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Main Front Window ({{ states('sensor.main_side_window_battery') }}%)"
+    entity_id: binary_sensor.main_side_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  bathroom_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Bathroom Window ({{ states('sensor.bathroom_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Bathroom Window ({{ states('sensor.bathroom_window_battery') }}%)"
+    entity_id: binary_sensor.bathroom_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  office_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Office Window ({{ states('sensor.office_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Office Window ({{ states('sensor.office_window_battery') }}%)"
+    entity_id: binary_sensor.office_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  bedroom_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Bedroom Window ({{ states('sensor.bedroom_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Bedroom Window ({{ states('sensor.bedroom_window_battery') }}%)"
+    entity_id: binary_sensor.bedroom_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  kitchen_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Kitchen Window ({{ states('sensor.kitchen_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Kitchen Window ({{ states('sensor.kitchen_window_battery') }}%)"
+    entity_id: binary_sensor.kitchen_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  main_front_window_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Main Front Window ({{ states('sensor.main_front_window_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Main Front Window ({{ states('sensor.main_front_window_battery') }}%)"
+    entity_id: binary_sensor.main_front_window_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a
+  hallway_thermostat_lowbatt:
+    name: "\U0001F50B Low Battery Detected in Hallway Thermostat ({{ states('sensor.hallway_thermostat_battery') }}%)"
+    done_message: "\U0001F50B Battery Restored in Hallway Thermostat ({{ states('sensor.hallway_thermostat_battery') }}%)"
+    entity_id: binary_sensor.kitchen_closet_multi_lowbatt
+    state: 'on'
+    repeat:
+      - 5
+      - 1440
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - mobile_app_pixel_3a

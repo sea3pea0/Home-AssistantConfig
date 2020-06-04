@@ -1,0 +1,411 @@
+# Automations
+
+automation:
+
+# Automations for turning main light OFF based on time and sensors
+
+  - alias: Main Auto-Off
+    trigger:
+      - platform: state
+        entity_id: media_player.nvidia_shield
+        to: "off"
+        for:
+          minutes: 5
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: "off"
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('light.main', 'on') or not (is_state('input_select.main_effect', 'none')) }}"
+        - condition: template
+          value_template: "{{states('sensor.desktop_uptime') == 'unknown'}}"
+        - condition: state
+          entity_id: binary_sensor.main_pir
+          state: 'off'
+          for:
+            minutes: 5
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: media_player.nvidia_shield
+              state: 'off'
+              for:
+                minutes: 5
+    action:
+      - service: light.turn_off
+        entity_id: light.main
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: "none"
+
+# Automations for turning main light ON based on time and sensors
+
+  - alias: Main Auto On 1 Midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '00:00:00'
+          before: '02:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 10
+          white_value: 0
+
+  - alias: Main Auto On 1 Midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '00:00:00'
+          before: '02:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 10
+          white_value: 0
+
+  - alias: Main Auto On 2 AM
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '02:00:00'
+          before: '07:00:00'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          below: 1
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 5
+          white_value: 0
+
+  - alias: Main Auto On 4 Dawn
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '02:00:00'
+          before: '08:00:00'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 0
+          below: 100
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 50 
+          white_value: 0
+
+  - alias: Main Auto On 5 Morning
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 100
+        - condition: time
+          after: '05:00:00'
+          before: '08:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 100
+          white_value: 0
+
+  - alias: Main Auto On 6 Morning late
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '08:00:00'
+          before: '09:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 80
+          white_value: 0
+
+  - alias: Main Auto On 7 Morning later
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '09:00:00'
+          before: '09:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 60
+          white_value: 0
+
+  - alias: Main Auto On 8 day
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '09:30:00'
+          before: '10:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 40
+          white_value: 0
+
+  - alias: main auto on 10 eve
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          below: 60
+        - condition: time
+          after: '16:00'
+          before: '19:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 100
+          white_value: 255
+
+  - alias: Main Auto On 11 Night
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '19:30:00'
+          before: '20:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 90
+          white_value: 0
+
+  - alias: Main Auto On 11.5 Night2
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '20:30:00'
+          before: '21:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 75
+          white_value: 0
+
+  - alias: Main Auto On 12 Late
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '21:30:00'
+          before: '22:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 55
+          white_value: 0
+
+  - alias: Main Auto On 13 Later
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '22:30:00'
+          before: '23:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 40
+          white_value: 0
+
+  - alias: Main Auto On 14 almost midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '23:30:00'
+          before: '00:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 25
+          white_value: 0
+

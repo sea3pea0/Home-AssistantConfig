@@ -1,0 +1,32 @@
+
+  main_tv:
+    name: TV
+    icon: mdi:television
+  announcements:
+    name: Announcements
+    icon: mdi:bullhorn
+  notifications:
+    name: Notifications
+    icon: mdi:telegram
+  good_morning:
+    name: Good Morning
+  aura_effect:
+    name: Aura Effect
+    icon: mdi:led-strip-variant
+  fire_effect:
+    name: Fire Effect
+    icon: mdi:led-strip-variant
+  storm_effect:
+    name: Storm Effect
+    icon: mdi:led-strip-variant
+  police_effect:
+    name: Police Effect
+    icon: mdi:led-strip-variant
+  rainbow_effect:
+    name: Rainbow Effect
+    icon: mdi:led-strip-variant
+  none_effect:
+    name: No Effect
+    icon: mdi:led-strip-variant
+  home_everyone:
+    name: Everyone Home

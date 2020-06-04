@@ -1,0 +1,163 @@
+automation:
+  - alias: Main Effect Aura
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Aura'
+      - platform: state
+        entity_id: input_boolean.aura_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.aura_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Aura'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 9
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Fire
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Fire'
+      - platform: state
+        entity_id: input_boolean.fire_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.fire_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Fire'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 6
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.aura_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect None
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'none'
+      - platform: state
+        entity_id: input_boolean.none_effect
+        to: 'on' 
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.none_effect
+      - service: zwave.set_config_parameter
+        data:
+          node_id: 2
+          parameter: 72
+          value: 1
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.aura_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.storm_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Police
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Police'
+      - platform: state
+        entity_id: input_boolean.police_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.police_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Police'
+      - service: zwave.set_config_parameter
+        data:
+          node_id: 2
+          parameter: 72
+          value: 10
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.aura_effect
+  - alias: Main Effect Rainbow
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Rainbow'
+      - platform: state
+        entity_id: input_boolean.rainbow_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.rainbow_effect
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.main_effect
+          option: 'Rainbow'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 8
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.aura_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Storm
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Storm'
+      - platform: state
+        entity_id: input_boolean.storm_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.storm_effect
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.main_effect
+          option: 'Storm'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 7
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.aura_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect

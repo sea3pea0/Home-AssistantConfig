@@ -1,0 +1,144 @@
+title: Pea Palace
+views:
+  - badges: []
+    cards:
+      - entity: weather.dark_sky
+        type: 'custom:weather-card'
+      - detail: 2
+        entity: sensor.main_co2
+        graph: line
+        theme: default
+        type: sensor
+        unit: ppm
+      - card:
+          show_header_toggle: false
+          title: Pea Central
+          type: entities
+        filter:
+          exclude:
+            - entity_id: sensor.ups_battery
+          include:
+            - attributes:
+                unit_of_measurement: '%'
+              entity_id: sensor.*_battery
+              state: < 30
+            - entity_id: climate.thermostat_hallway_mode
+            - entity_id: switch.fan
+            - entity_id: light.main
+            - entity_id: input_select.main_effect
+            - entity_id: light.kitchen
+            - entity_id: light.hallway
+            - entity_id: light.bathroom
+            - entity_id: camera.front_porch
+            - entity_id: light.front
+            - entity_id: light.back
+        type: 'custom:auto-entities'
+    icon: 'mdi:home'
+    panel: false
+    path: default_view
+    title: Home
+  - badges: []
+    cards:
+      - entities:
+          - entity: binary_sensor.bedroom_pir
+            name: Motion
+          - entity: binary_sensor.bedroom_closet_pir
+            name: Closet Motion
+        type: glance
+      - entities:
+          - entity: light.bedroom_closet
+          # - entity: switch.bedroom_tv
+          #   name: TV
+        show_header_toggle: false
+        type: entities
+      - entity: light.bedroom
+        type: light
+    icon: 'mdi:bed-empty'
+    title: Bedroom
+  - badges: []
+    cards:
+      - type: picture-glance
+        state_filter:
+          - 'on'
+        camera_image: camera.front_porch
+        camera_view: live
+        entities:
+          - binary_sensor.front_porch_person
+          - light.front
+      - entities:
+          - entity: alarm_control_panel.alarm
+            name: Alarm
+          # - entity: switch.main_siren
+          #   name: Siren
+          # - entity: switch.front_cam_record
+        show_header_toggle: false
+        title: Security
+        type: entities
+      - card:
+          show_header_toggle: false
+          title: Activity
+        entities:
+          - entity: !secret person_2
+          - entity: !secret person_1
+          - entity: binary_sensor.main_pir
+            name: Main
+          - entity: binary_sensor.hallway_pir
+            name: Hallway
+          - entity: binary_sensor.bedroom_pir
+            name: Bedroom
+          - entity: binary_sensor.bathroom_pir
+            name: Bathroom
+          - entity: binary_sensor.front_pir
+            name: Front Porch
+          - entity: binary_sensor.front_patio_pir
+            name: Front Patio
+          - entity: binary_sensor.front_door
+            name: Front Porch
+          - entity: binary_sensor.laundry_pir
+            name: Laundry Room
+          - entity: binary_sensor.back_pir
+            name: Back Porch
+          - entity: binary_sensor.bacK_door
+            name: Back Porch
+          - entity: binary_sensor.bedroom_closet_pir
+            name: Bedroom Closet
+          - entity: binary_sensor.kitchen_pir
+            name: Kitchen
+          - entity: binary_sensor.main_side_window
+            name: Side Window
+          - entity: binary_sensor.kitchen_window
+            name: Kitchen Window
+          - entity: binary_sensor.office_window
+            name: Office Window
+          - entity: binary_sensor.main_front_window
+            name: Front Window
+          - entity: binary_sensor.bathroom_window
+            name: Bathroom Window
+          - entity: binary_sensor.bedroom_window
+            name: Bedroom Window
+          - entity: binary_sensor.main_gas_detector
+            name: Gas Leak
+          - entity: binary_sensor.front_porch_camera_motion
+            name: Front Porch Camera Motion
+          - entity: binary_sensor.front_porch_person
+            name: Front Porch Person Detected
+        state_filter:
+          - 'on'
+          - home
+        type: entity-filter
+    icon: 'mdi:security'
+    path: security_view
+    title: Security View
+  - badges: []
+    cards:
+      - entities:
+          - entity: input_boolean.announcements
+          - entity: input_boolean.notifications
+        show_header_toggle: false
+        title: Settings
+        type: entities
+
+    icon: 'mdi:cog'
+    panel: false
+    path: automation_view
+    title: Settings

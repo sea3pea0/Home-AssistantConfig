@@ -1,0 +1,233 @@
+alert:
+  gas_leak:
+    name: "Gas Leak Detected"
+    message: "⛽️ Gas leak detected!"
+    done_message: "👌 Gas no longer detected"
+    entity_id: binary_sensor.main_gas_detector
+    state: 'on'
+    repeat: 1
+    can_acknowledge: false
+    skip_first: false
+    notifiers:
+      - telegram
+
+  co2_high:
+    name: "Indoor CO2 Level High"
+    message: "⚠️ Indoor CO2 level is High ({{states('sensor.main_co2')}}ppm)"
+    entity_id: binary_sensor.co2_high
+    state: 'on'
+    repeat:
+      - 1
+      - 15
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - telegram
+    data:
+      inline_keyboard:
+        - 'Fan On:/fan_on, Dismiss (Turn Off Alert):/dismiss'
+
+  ups_status:
+    name: "\U000026A1 AC Power Disconnected"
+    done_message: "\U000026A1 AC Power Restored"
+    entity_id: sensor.myups_status_data
+    state: 'OB'
+    repeat: 
+      - 30
+      - 60
+      - 120
+      - 720
+      - 1440
+    can_acknowledge: True
+    skip_first: False
+    notifiers:
+      - telegram
+
+automation:
+
+  - alias: telegram Mail
+    trigger:
+      platform: state
+      entity_id: binary_sensor.mailbox_vibration
+      to: 'on'
+    action:
+      - service: notify.telegram
+        data:
+          message: "📬 You've Got Mail!"
+
+  # Commands
+
+  - alias: Telegram Command Fan On
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_on@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_on'
+    condition:
+      - condition: state
+        entity_id: switch.fan
+        state: 'off'
+    action:
+      - service: switch.turn_on
+        entity_id: switch.fan
+      - wait_template: "{{ is_state('switch.fan', 'on') }}"
+        timeout: '00:00:05'
+        continue_on_timeout: false
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "The fan has been turned on"
+
+  - alias: Telegram Command Fan On (already on)
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_on@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_on'
+    condition:
+      - condition: state
+        entity_id: switch.fan
+        state: 'on'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "The fan is already on!"
+
+  - alias: Telegram Command Fan Off
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_off@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_off'
+    condition:
+      - condition: state
+        entity_id: switch.fan
+        state: 'on'
+    action:
+      - service: switch.turn_off
+        entity_id: switch.fan
+      - wait_template: "{{ is_state('switch.fan', 'off') }}"
+        timeout: '00:00:05'
+        continue_on_timeout: false
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "The fan has been turned off"
+
+  - alias: Telegram Command Fan Off (already off)
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_off@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/fan_off'
+    condition:
+      - condition: state
+        entity_id: switch.fan
+        state: 'off'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "The fan is already off!"
+
+  # Callbacks
+
+  - alias: Telegram Callback Roomba Start
+    trigger:
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/clean'
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Start Roomba' }}"
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "Roomba will begin cleaning the house now"
+      - service: telegram_bot.edit_message
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          inline_keyboard:
+          message: >
+            {{ trigger.event.data.from_first }} (user-id:{{ trigger.event.data.user_id }}) Initiated a cleaning cycle with Roomba
+      - service: remote.send_command
+        entity_id: remote.main
+        data:
+          entity_id: remote.main
+          device: 59458525
+          command: Clean
+          num_repeats: 1
+          delay_secs: 0.75
+          hold_secs: 1
+
+  - alias: Telegram Callback Fan On
+    trigger:
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/fan_on'
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Fan On' }}"
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "Turning the Fan On"
+      - service: switch.turn_on
+        entity_id: switch.fan
+      - service: telegram_bot.edit_message
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          inline_keyboard:
+          message: >
+            {{ trigger.event.data.from_first }} (user-id:{{ trigger.event.data.user_id }}) responded to a High CO2 Warning by turning the fan on
+
+  - alias: Telegram Callback Dismiss CO2 High Alert
+    trigger:
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/dismiss'
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Fan On' }}"
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Dismissed'
+      - service: telegram_bot.edit_message
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          inline_keyboard:
+          message: >
+            {{ trigger.event.data.from_first }} (user-id:{{ trigger.event.data.user_id }}) dismissed & turned off High CO2 Alerts
+      - service: alert.turn_off
+        entity_id: alert.co2_high

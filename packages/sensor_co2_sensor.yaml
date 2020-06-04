@@ -1,0 +1,37 @@
+binary_sensor:
+  - platform: template
+    sensors:
+      co2_high:
+        value_template: "{{ states('sensor.main_co2')|int >= 3000 }}"
+automation:
+  - alias: CO2 Level High
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.main_co2
+        above: 3000
+    action:
+      - service: input_select.select_option
+        entity_id: input_select.intel_nuc_led
+        data:
+          option: red
+  - alias: CO2 Level Moderate
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.main_co2
+        above: 2000
+        below: 3000
+    action:
+      - service: input_select.select_option
+        entity_id: input_select.intel_nuc_led
+        data:
+          option: yellow
+  - alias: CO2 Level Normal
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.main_co2
+        below: 2000
+    action:
+      - service: input_select.select_option
+        entity_id: input_select.intel_nuc_led
+        data:
+          option: green

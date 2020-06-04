@@ -1,0 +1,29 @@
+# Automations
+
+automation:
+
+# Automatically turn bedroom closet light on
+
+  - alias: Bedroom Closet Off
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bedroom_closet_pir
+        to: 'on'
+    action:
+      - data:
+          entity_id: light.bedroom_closet
+        service: light.turn_on
+
+# Automatically turn OFF Bedroom Closet light based on time & sensor input_boolean
+
+  - alias: Bedroom Closet Off
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bedroom_closet_pir
+        to: 'off'
+        for:
+          minutes: '1'
+    action:
+      - data:
+          entity_id: light.bedroom_closet
+        service: light.turn_off

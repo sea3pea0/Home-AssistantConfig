@@ -1,0 +1,19 @@
+- id: '1574967728326'
+  name: Main Morning
+  entities:
+    light.main:
+      brightness: 255
+      hs_color:
+      - 32.374
+      - 54.51
+      rgb_color:
+      - 255
+      - 190
+      - 115
+      state: 'on'
+      xy_color:
+      - 0.478
+      - 0.394
+    light.main_white:
+      brightness: 255
+      state: 'on'

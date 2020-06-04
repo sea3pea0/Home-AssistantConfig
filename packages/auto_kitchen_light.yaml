@@ -1,0 +1,237 @@
+# Automations
+
+automation:
+
+# Automatically turn OFF Kitchen light based on time & sensor input_boolean
+
+  - alias: Kitchen Auto-Off
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: "off"
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          state: 'on'
+          entity_id: light.kitchen
+        - condition: template
+          value_template: "{{states('sensor.desktop_uptime') == 'unknown'}}"
+    action:
+      - service: light.turn_off
+        entity_id: light.kitchen
+
+# Automatically turn ON Kitchen light based on time & sensor input_boolean
+
+  - alias: Kitchen Auto On 1 Midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '00:00:00'
+          before: '02:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 40
+
+  - alias: Kitchen Auto On 2 AM
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '01:00:00'
+          before: '02:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 20
+
+  - alias: Kitchen Auto On 4 Dawn
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '05:00:00'
+          before: '10:00:00'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 0
+          below: 100
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 50 
+
+  - alias: Kitchen Auto On 5 Morning
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 100
+          below: 500
+        - condition: time
+          after: '05:00:00'
+          before: '10:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 100
+
+  - alias: Kitchen auto on 10 eve
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          below: 60
+        - condition: time
+          after: '16:00'
+          before: '19:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 100
+
+  - alias: Kitchen Auto On 11 Night
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '19:30:00'
+          before: '20:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 90
+
+  - alias: Kitchen Auto On 11.5 Night2
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '20:30:00'
+          before: '21:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 75
+
+  - alias: Kitchen Auto On 12 Late
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '21:30:00'
+          before: '22:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 55
+
+  - alias: Kitchen Auto On 13 Later
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '22:30:00'
+          before: '23:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 40
+
+  - alias: Kitchen Auto On 14 almost midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'off'
+        - condition: time
+          after: '23:30:00'
+          before: '00:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.kitchen
+        data:
+          brightness_pct: 25

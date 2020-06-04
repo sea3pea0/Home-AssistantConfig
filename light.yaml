@@ -1,0 +1,19 @@
+  - platform: switch
+    name: Hallway
+    entity_id: switch.hallway
+  - platform: switch
+    name: Bathroom
+    entity_id: switch.bathroom
+  - platform: switch
+    name: Bedroom Closet
+    entity_id: switch.bedroom_closet
+  - platform: switch
+    name: Back
+    entity_id: switch.back
+
+  - platform: group
+    name: Main
+    entities:
+      - light.main_rgbw
+      - light.main_dimmer
+

@@ -1,0 +1,130 @@
+# Automations
+automation:
+
+# Time Based Automations
+
+  - alias: Time kitchen 1 midnight
+    description: Adjust Kitchen light at midnight when its on
+    trigger:
+    - at: '00:00:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 10
+      service: light.turn_on
+
+  - alias: Time kitchen 2 AM
+    description: Adjust Kitchen light at AM when its on
+    trigger:
+    - at: '01:00:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 5
+      service: light.turn_on
+
+  - alias: Time kitchen 4 dawn
+    description: Adjust Kitchen light at dawn when its on
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.front_luminance
+      above: 0
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.kitchen
+          state: 'on'
+        - condition: time
+          after: '02:00:00'
+          before: '07:00:00'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 50
+      service: light.turn_on
+
+  - alias: Time kitchen 11 night
+    description: Adjust Kitchen light at night when its on
+    trigger:
+    - at: '19:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 90
+      service: light.turn_on
+
+  - alias: Time kitchen 11.5 night2
+    description: Adjust Kitchen light at night2 when its on
+    trigger:
+    - at: '20:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 75
+      service: light.turn_on
+
+  - alias: Time kitchen 12 late
+    description: Adjust Kitchen light at late when its on
+    trigger:
+    - at: '21:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 55
+      service: light.turn_on
+
+  - alias: Time kitchen 13 later
+    description: Adjust Kitchen light at later when its on
+    trigger:
+    - at: '22:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 40
+      service: light.turn_on
+
+  - alias: Time kitchen 14 almost midnight
+    description: Adjust Kitchen light at almost midnight when its on
+    trigger:
+    - at: '23:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.kitchen
+      state: 'on'
+    action:
+    - data:
+        entity_id: light.kitchen
+        brightness_pct: 25
+      service: light.turn_on

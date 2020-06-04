@@ -1,0 +1,12 @@
+
+  main_effect:
+    name: Main Effect
+    options:
+      - Aura
+      - Rainbow
+      - Fire
+      - Storm
+      - Police
+      - none
+    initial: none
+    icon: mdi:led-strip

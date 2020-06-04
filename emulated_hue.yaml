@@ -1,0 +1,31 @@
+  expose_by_default: false
+  entities:
+    light.back:
+      hidden: false
+      name: 'Back Porch'
+    light.front:
+      hidden: false
+      name: 'Front Porch'
+    light.kitchen:
+      hidden: false
+      name: 'Kitchen'
+    light.main:
+      hidden: false
+      name: 'Ambient Light'
+    light.main_lights:
+      hidden: false
+      name: 'Main Lights'
+    switch.main_fan:
+      name: Main Fan
+      hidden: false
+    switch.bedroom_tv:
+      name: Bedroom TV
+      hidden: false
+    switch.bedroom_pi:
+      name: Bedroom Pi
+      hidden: false
+    switch.main_receiver:
+      name: Main Receiver
+      hidden: false
+    switch.main_tv:
+      name: Main TV

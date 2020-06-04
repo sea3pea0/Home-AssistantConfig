@@ -1,0 +1,19 @@
+roomba_callback:
+  sequence:
+    - service: script.callback_handled
+      data_template:
+        replace_original: false
+        payload: '{{ payload }}'
+    - condition: template
+      value_template: >
+        {%- set action = (payload | from_json).actions[0] -%}
+        {{ (action.value == "Clean") and not (action.name == "")}}
+    - service: remote.send_command
+      entity_id: remote.main
+      data:
+        entity_id: remote.main
+        device: 59458525
+        command: Clean
+        num_repeats: 1
+        delay_secs: 0.75
+        hold_secs: 1

@@ -1,0 +1,118 @@
+#Automations
+
+automation:
+
+# Time Based Automations
+
+  - alias: Time settings 1 midnight
+    description: 'Turn good morning off for new day'
+    trigger:
+    - at: '00:00:00'
+      platform: time
+    condition: []
+    action:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: input_boolean.good_morning
+    - service: climate.turn_off
+      entity_id: climate.thermostat_hallway_mode
+
+  - alias: Time Coffee 4 Good Morning
+    description: 'When coffee machine is on switch good morning on'
+    trigger:
+    - above: '150'
+      entity_id: sensor.coffee_machine_power
+      platform: numeric_state
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.good_morning
+          state: 'off'
+        - condition: time
+          after: '05:00:00'
+          before: '12:00:00'
+    action:
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.good_morning
+
+  - alias: Time settings 5 morning
+    description: 'Morning Settings'
+    trigger:
+      - platform: time
+        at: '07:00:00'
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id:
+            - media_player.main_display
+            - media_player.bedroom_speaker
+          volume_level: 0.5
+      - service: climate.turn_on
+        entity_id: climate.thermostat_hallway_mode
+      - service: frontend.set_theme
+        data:
+          name: default
+
+  - alias: Time settings 8 day
+    description: 'Daytime Settings'
+    trigger:
+      - platform: time
+        at: '09:30:00'
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id:
+            - media_player.main_display
+            - media_player.bedroom_speaker
+          volume_level: 0.6
+      - service: alert.turn_on
+        entity_id:
+          - alert.co2_high
+
+  - alias: Time settings 10 eve
+    description: 'Set volume to 0.5 when its evening'
+    trigger:
+      - platform: time
+        at: '16:30:00'
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id:
+            - media_player.main_display
+            - media_player.bedroom_speaker
+          volume_level: 0.5
+
+  - alias: Time settings 11 night
+    description: 'Set volume to 0.4 at night'
+    trigger:
+      - platform: time
+        at: '19:30:00'
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id:
+            - media_player.main_display
+            - media_player.bedroom_speaker
+          volume_level: 0.4
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.announcements
+      - service: frontend.set_theme
+        data:
+          name: blue_night
+
+  - alias: Time settings 12 late
+    description: 'Set volume to 0.3 when its late'
+    trigger:
+      - platform: time
+        at: '21:30:00'
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id:
+            - media_player.main_display
+            - media_player.bedroom_speaker
+          volume_level: 0.3
+      - service: climate.turn_off
+        entity_id: climate.thermostat_hallway_mode

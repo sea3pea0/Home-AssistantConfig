@@ -1,0 +1,383 @@
+automation:
+  # Telegram Commands
+  - alias: 'Arm the Alarm System Command tg'
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/arm@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/arm'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "Alarm System will be armed!"
+      - service: alarm_control_panel.alarm_arm_away
+        data:
+          entity_id: alarm_control_panel.alarm
+          code: !secret alarm_code
+  - alias: 'Disarm the Alarm System Command tg'
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/disarm@cmarty_bot'
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: '/disarm'
+    action:
+      - service: telegram_bot.send_message
+        data_template:
+          target: 
+            - "{{ trigger.event.data.chat_id }}"
+          message: "Disarming the Alarm System"
+      - service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.alarm
+          code: !secret alarm_code
+  # Telegram Callbacks
+  - alias: 'Arm the Alarm System Callback tg'
+    trigger:
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/arm'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: 'Yes'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: 'yes'
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Arm the Alarm System' }}"
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "Alarm System will be armed!"
+      - service: alarm_control_panel.alarm_arm_away
+        data:
+          entity_id: alarm_control_panel.alarm
+          code: !secret alarm_code
+      - service: telegram_bot.edit_message
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          inline_keyboard:
+          message: >
+            {{ trigger.event.data.from_first }} (user-id:{{ trigger.event.data.user_id }}) Initiated the arming procedure for the Alarm System
+  - alias: 'Disarm the Alarm System Callback tg'
+    trigger:
+      platform: event
+      event_type: telegram_callback
+      event_data:
+        data: '/disarm'
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "Disarming the Alarm System!"
+      - service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.alarm        
+          code: !secret alarm_code
+  - alias: 'telegram callback - Alarm Arm Dismiss'
+    trigger:
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: '/dismiss'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: 'No'
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          data: 'no'
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Arm the Alarm System' }}"
+    action:
+      - service: telegram_bot.answer_callback_query
+        data_template:
+          callback_query_id: '{{ trigger.event.data.id }}'
+          message: 'Dismissed'
+      - service: telegram_bot.edit_message
+        data_template:
+          message_id: '{{ trigger.event.data.message.message_id }}'
+          chat_id: '{{ trigger.event.data.chat_id }}'
+          inline_keyboard:
+          message: >
+            {{ trigger.event.data.from_first }} (user-id:{{ trigger.event.data.user_id }}) decided not to Arm the Alarm System
+
+  # - alias: 'Video Callback tg'
+  #   trigger:
+  #     platform: event
+  #     event_type: telegram_callback
+  #   condition:
+  #     - condition: template
+  #       value_template: "{{ trigger.event.data.message.reply_markup.inline_keyboard[0][0].text == 'Get Video' }}"
+  #   action:
+  #     - service: script.turn_on
+  #       data_template:
+  #         entity_id: script.post_video
+  #         variables:
+  #           time_diff: "{{ (states('sensor.date') + ' ' + states('sensor.time'))|as_timestamp()|int - trigger.event.data.message.date|int }}"
+  #           wait_time: >
+  #             {% set time_lapse = now()|as_timestamp()|int - trigger.event.data.message.date|int %}
+  #             {% if time_lapse < 35 %}
+  #               {{ 35 - time_lapse }}
+  #             {% else %}
+  #               0
+  #             {% endif %}
+  #           camera: >
+  #             {% if 'front_porch' in trigger.event.data.data %}
+  #               front_porch
+  #             {% else %}
+  #               unknown
+  #             {% endif %}
+  #           mp4_name: "{{ trigger.event.data.data }}"
+  #           message_id: "{{ trigger.event.data.message.message_id }}"
+  #           caption: "{{ trigger.event.data.message.caption }}"
+  #           chat_id: "{{ trigger.event.data.chat_id }}"
+  #           callback_query: "{{ trigger.event.data.id }}"
+  #           user_first: "{{ trigger.event.data.from_first }}"
+  #           user_id: "{{ trigger.event.data.user_id }}"
+
+  # Alarm Notifications
+  - alias: 'telegram Alarm Armed in Away mode'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'armed_away'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: "🔒 The Alarm System is Armed! {{ states('sensor.date') }} {{ states('sensor.time') }}"
+  - alias: 'telegram Alarm pending Arm'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'pending'
+        from: 'disarmed'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: "⚠️ The Alarm System has been set to Arm in 60 seconds {{ states('sensor.date') }} {{ states('sensor.time') }}"
+  - alias: 'telegram Alarm Disarmed'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'disarmed'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: "🔓 The Alarm System is Disarmed! {{ states('sensor.date') }} {{ states('sensor.time') }}"
+  - alias: 'telegram Alarm Triggered Pending Activation'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'pending'
+        from: 'armed_away'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: "⚠️ The Alarm System has been Triggered by {{ states('input_text.alarm_trigger') }} and will activate in 60 seconds {{ states('sensor.date') }} {{ states('sensor.time') }}"
+  - alias: 'telegram Alarm Triggered'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'triggered'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: "🚨 The Alarm System is now active! {{ states('sensor.date') }} {{ states('sensor.time') }}"
+# Away
+  - alias: telegram People Departed Home Empty - Ask if alarm should be armed
+    trigger:
+      - platform: state
+        entity_id: group.people
+        to: 'not_home'
+    condition:
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: notify.telegram
+        data_template:
+          message: >-
+            {% if states('group.home_not_secure') == 'on' %}
+              🏠 Everyone has left home but the following Windows/Doors are still open
+              *{%- for binary_sensor in states.binary_sensor %}
+              {%- if binary_sensor.state == 'on' %}
+                {%- if 'window' in binary_sensor.entity_id or 'door' in binary_sensor.entity_id %} - {{ binary_sensor.name }}
+                {%- endif %}
+              {%- endif %}
+              {%- endfor %}*
+              Switching to away mode.
+            {% else %}
+              🏠 Everyone has left home, the house is secure. Switching to away mode.
+            {% endif %}
+          data:
+            inline_keyboard:
+              - 'Arm the Alarm System:/arm, Dismiss:/dismiss'
+
+  - alias: telegram Everyone Home Insecure
+    trigger:
+      - platform: state
+        entity_id: group.people
+        to: 'home'
+        for: '00:00:30'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: alarm_control_panel.alarm
+          state:  'disarmed'
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+    action:
+      - service: script.turn_on
+        entity_id: script.people_home
+        data_template:
+          variables:
+            message_text: "🏠 People arriving home, changing to Home Mode"
+  - alias: telegram Home Secure
+    trigger:
+      - platform: state
+        entity_id: person.cp
+        to: "home"
+        for: '00:00:30'
+      - platform: state
+        entity_id: person.yulia
+        to: "home"
+        for: '00:00:30'
+      - platform: state
+        entity_id: group.people
+        to: 'home'
+        for: '00:00:30'
+    condition:
+      condition: and
+      conditions:
+      - condition: state
+        entity_id: alarm_control_panel.alarm
+        state:  'armed_away'
+      - condition: state
+        entity_id: input_boolean.notifications
+        state: 'on'
+    action:
+      - service: script.turn_on
+        entity_id: script.people_home
+        data_template:
+          variables:
+            message_text: "🏠 People arriving home. Disarming the Alarm System and changing to Home Mode"
+
+# Tamper Notifications
+  - alias: Main PIR Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Main PIR"
+
+  - alias: Hallway PIR Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.hallway_pir_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Hallway PIR"
+
+  - alias: Bathroom PIR Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bathroom_pir_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Bathroom PIR"
+
+  - alias: Laundry PIR Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.laundry_pir_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Laundry PIR"
+
+  - alias: Bedroom PIR Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.bedroom_pir_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Bedroom PIR"
+
+  - alias: Front Door Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.front_door_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Front Door"
+
+  - alias: Back Door Tamper
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.back_door_tamper
+        to: "on"
+    action:
+      - service: notify.telegram
+        data:
+          message: "🔧 Tampering detected on Back Door"
+
+script:
+  # People Arriving Home and Alarm Disarmed
+  people_home:
+    sequence:
+      - service: notify.telegram
+        data_template:
+          message: "{{ message_text }}"
+      - delay: '00:01:00'

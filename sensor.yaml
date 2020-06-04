@@ -1,0 +1,62 @@
+  - platform: darksky
+    api_key: !secret dark_sky_api
+    units: us
+    monitored_conditions:
+      # - precip_type
+      # - precip_intensity
+      - precip_probability
+      # - precip_accumulation
+      # - temperature
+      # - apparent_temperature
+      # - dew_point
+      - wind_speed
+      - wind_gust
+      # - wind_bearing
+      # - cloud_cover
+      # - humidity
+      # - pressure
+      # - visibility
+      # - ozone
+      # - minutely_summary
+      - hourly_summary
+      - daily_summary
+      - temperature_high
+      - temperature_low
+      # - apparent_temperature_high
+      # - apparent_temperature_low
+      # - precip_intensity_max
+      # - uv_index
+      - moon_phase
+      # - sunrise_time
+      # - sunset_time
+      - nearest_storm_distance
+      # - nearest_storm_bearing
+      - alerts
+
+  - platform: template
+    sensors:
+
+      template_last_motion:
+        friendly_name: 'Last Motion'
+        value_template: >
+          {%- set sensors = [states.binary_sensor.main_pir, states.binary_sensor.hallway_pir, states.binary_sensor.bedroom_pir, states.binary_sensor.bathroom_pir, states.binary_sensor.bedroom_closet_pir, states.binary_sensor.back_pir, states.binary_sensor.front_pir, states.binary_sensor.laundry_pir, states.binary_sensor.patio_pir,states.binary_sensor.kitchen_pir] %}
+          {% for sensor in sensors %}
+            {% if as_timestamp(sensor.last_changed) == as_timestamp(sensors | map(attribute='last_changed') | max) %}
+              {{ sensor.name }}
+            {% endif %}
+          {% endfor %}
+
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+
+  - platform: snmp
+    name: Desktop Uptime
+    host: !secret desktop_ip
+    community: !secret snmp_community
+    baseoid: !secret snmp_baseoid
+    accept_errors: true
+    unit_of_measurement: 'minutes'
+    value_template: '{{((value | int) / 6000) | int}}'
