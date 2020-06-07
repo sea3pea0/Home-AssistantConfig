@@ -10,10 +10,18 @@
   - platform: switch
     name: Back
     entity_id: switch.back
+  - platform: switch
+    name: Disco
+    entity_id: switch.aeotec_zstick_disco_light
+  - platform: switch
+    name: AP LED
+    entity_id: switch.unifi_ap_led
+  - platform: switch
+    name: Switch LED
+    entity_id: switch.unifi_switch_led
 
   - platform: group
     name: Main
     entities:
       - light.main_rgbw
       - light.main_dimmer
-

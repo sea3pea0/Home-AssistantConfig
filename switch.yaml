@@ -14,10 +14,10 @@
   - platform: command_line
     switches:
       aeotec_zstick_disco_light:
-        friendly_name: 'Aeotec Z-Stick Disco Light'
+        friendly_name: 'Disco Light'
         command_on: !secret disco_on
         command_off: !secret disco_off
-      unifi_ap_light:
-        friendly_name: 'Unifi AP Light'
-        command_on: !secret unifi_led_on
-        command_off: !secret unifi_led_off
+      unifi_ap_led:
+        friendly_name: 'AP LED'
+        command_on: !secret unifi_ap_led_on
+        command_off: !secret unifi_ap_led_off
