@@ -21,8 +21,10 @@ input_boolean:
   # Front Porch Camera Boolean Switches as inputs for corresponding binary_senors
   front_porch_camera_motion:
     name: Front Porch Camera Motion
+    initial: off
   front_porch_person:
     name: Front Porch Person Detected
+    initial: off
 
 input_text:
 
