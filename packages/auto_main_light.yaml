@@ -71,31 +71,6 @@ automation:
           brightness_pct: 10
           white_value: 0
 
-  - alias: Main Auto On 1 Midnight
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.main_pir
-        to: 'on'
-    condition:
-      condition: and
-      conditions:
-        - condition: state
-          entity_id: light.main
-          state: 'off'
-        - condition: state
-          entity_id: input_select.main_effect
-          state: 'none'
-        - condition: time
-          after: '00:00:00'
-          before: '02:00:00'
-    action:
-      - service: light.turn_on
-        entity_id: light.main
-        data:
-          color_name: red
-          brightness_pct: 10
-          white_value: 0
-
   - alias: Main Auto On 2 AM
     trigger:
       - platform: state
@@ -112,7 +87,7 @@ automation:
           state: 'none'
         - condition: time
           after: '02:00:00'
-          before: '07:00:00'
+          before: '08:00:00'
         - condition: numeric_state
           entity_id: sensor.front_luminance
           below: 1
@@ -307,7 +282,7 @@ automation:
         data:
           color_name: orange
           brightness_pct: 90
-          white_value: 0
+          white_value: 122
 
   - alias: Main Auto On 11.5 Night2
     trigger:
@@ -332,7 +307,7 @@ automation:
         data:
           color_name: orange
           brightness_pct: 75
-          white_value: 0
+          white_value: 61
 
   - alias: Main Auto On 12 Late
     trigger:

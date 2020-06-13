@@ -11,21 +11,7 @@
       name: 'Kitchen'
     light.main:
       hidden: false
-      name: 'Ambient Light'
-    light.main_lights:
+      name: 'Main Light'
+    switch.fan:
+      name: Fan
       hidden: false
-      name: 'Main Lights'
-    switch.main_fan:
-      name: Main Fan
-      hidden: false
-    switch.bedroom_tv:
-      name: Bedroom TV
-      hidden: false
-    switch.bedroom_pi:
-      name: Bedroom Pi
-      hidden: false
-    switch.main_receiver:
-      name: Main Receiver
-      hidden: false
-    switch.main_tv:
-      name: Main TV
