@@ -1,0 +1,22 @@
+automation:
+  - alias: Unifi AP Led On
+    trigger:
+      - platform: time
+        at: 07:00:00
+    action:
+      - service: light.turn_on
+        entity_id: light.ap_led
+  - alias: Unifi AP Led Off
+    trigger:
+      - platform: time
+        at: '22:00:00'
+    action:
+      - service: light.turn_off
+        entity_id: light.ap_led
+switch:
+  - platform: command_line
+    switches:
+      unifi_ap_led:
+        friendly_name: 'AP LED'
+        command_on: !secret unifi_ap_led_on
+        command_off: !secret unifi_ap_led_off

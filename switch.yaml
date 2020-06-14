@@ -17,7 +17,3 @@
         friendly_name: 'Disco Light'
         command_on: !secret disco_on
         command_off: !secret disco_off
-      unifi_ap_led:
-        friendly_name: 'AP LED'
-        command_on: !secret unifi_ap_led_on
-        command_off: !secret unifi_ap_led_off

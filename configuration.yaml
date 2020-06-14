@@ -150,29 +150,31 @@ system_log:
 
 python_script:
 
-hacs:
-  token: !secret hacs_github_token
-  appdaemon: true
-  options:
-    country: US
-    experimental: true
+# hacs:
+#   token: !secret hacs_github_token
+#   appdaemon: true
+#   options:
+#     country: US
+#     experimental: true
 
 zeroconf:
 
-lovelace:
-  mode: yaml
-  resources:
-    - type: module
-      url: /hacsfiles/weather-card/weather-card.js
-    - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
-      type: module
-    - url: /hacsfiles/air-visual-card/air-visual-card.js
-      type: module
+# lovelace:
+  # mode: yaml
+  # resources:
+  #   - type: module
+  #     url: /hacsfiles/weather-card/weather-card.js
+  #   - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
+  #     type: module
+  #   - url: /hacsfiles/air-visual-card/air-visual-card.js
+  #     type: module
 
 geo_location:
   - platform: usgs_earthquakes_feed
     feed_type: 'past_month_m45_earthquakes'
     radius: 100
+    longitude: -117.7783775
+    latitude: 33.5583524
 
 config:
 

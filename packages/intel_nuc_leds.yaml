@@ -21,8 +21,8 @@ automation:
         to: green
     condition:
       condition: time
-      before: '06:00:00'
-      after: '00:00:00'
+      after: '22:00:00'
+      before: '07:00:00'
     action:
       - service: shell_command.nuc_led_off
   - alias: Nuc Led Green
@@ -32,14 +32,14 @@ automation:
         to: green
     condition:
       condition: time
-      after: '06:00:00'
-      before: '00:00:00'
+      after: '07:00:00'
+      before: '22:00:00'
     action:
       - service: shell_command.nuc_led_green
-  - alias: Nuc Led Off
+  - alias: Nuc Ring Led Off
     trigger:
       - platform: time
-        at: 00:00:00
+        at: '22:00:00'
     condition:
       condition: and
       conditions:
@@ -49,6 +49,30 @@ automation:
           value_template: "{{ not is_state('input_select.intel_nuc_led', 'red_flash') }}"
     action:
       - service: shell_command.nuc_led_off
+  - alias: Nuc Power Led Off
+    trigger:
+      - platform: time
+        at: '22:00:00'
+    action:
+      - service: shell_command.nuc_power_led_off
+  - alias: Nuc Ring Led On
+    trigger:
+      - platform: time
+        at: 07:00:00
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_select.intel_nuc_led
+          state: green
+    action:
+      - service: shell_command.nuc_led_green
+  - alias: Nuc Power Led On
+    trigger:
+      - platform: time
+        at: '07:00:00'
+    action:
+      - service: shell_command.nuc_power_led_blue
   - alias: Nuc Led Red
     trigger:
       - platform: state
@@ -63,8 +87,8 @@ automation:
         to: yellow
     condition:
       condition: time
-      before: '06:00:00'
-      after: '00:00:00'
+      after: '22:00:00'
+      before: '07:00:00'
     action:
       - service: shell_command.nuc_led_off
   - alias: Nuc Led Yellow
@@ -74,13 +98,19 @@ automation:
         to: yellow
     condition:
       condition: time
-      after: '06:00:00'
-      before: '00:00:00'
+      after: '07:00:00'
+      before: '22:00:00'
     action:
       - service: shell_command.nuc_led_yellow
 shell_command:
   nuc_led_green: !secret shell_nuc_led_green
   nuc_led_yellow: !secret shell_nuc_led_yellow
   nuc_led_red: !secret shell_nuc_led_red
+  nuc_led_pink: !secret shell_nuc_led_pink
+  nuc_led_cyan: !secret shell_nuc_led_cyan
+  nuc_led_white: !secret shell_nuc_led_white
+  nuc_power_led_blue: !secret shell_nuc_power_led_blue
+  nuc_power_led_amber: !secret shell_nuc_power_led_amber
+  nuc_power_led_off: !secret shell_nuc_power_led_off
   nuc_led_red_flash: !secret shell_nuc_led_red_flash
   nuc_led_off: !secret shell_nuc_led_off

@@ -259,10 +259,10 @@ automation:
   - alias: Clean Image Folders
     trigger:
       platform: time_pattern
-      hours: '/4'
+      minutes: '/15'
     action:
       - service: shell_command.delete_old_images
-      - delay: '00:01:00'
+      - delay: '00:05:00'
       - service: shell_command.delete_empty_folders
 
   # Alarm Trigger
@@ -432,7 +432,7 @@ automation:
 shell_command:
 
   # Image Folder Cleanup Commands
-  delete_old_images: find /share/camera/* -mindepth 4 -mmin +240 -exec rm {} \;
+  delete_old_images: find /share/camera/* -mindepth 4 -mmin +15 -exec rm {} \;
   delete_empty_folders: find /share/camera -mindepth 2 -type d -exec rmdir {} \;
 
 # switch:
