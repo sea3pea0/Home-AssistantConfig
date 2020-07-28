@@ -1,36 +1,5 @@
 automation:
-  - alias: tts CO2 High
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.co2_high
-        to: 'on'
-        for: 00:01:00
-    condition:
-      - condition: state
-        entity_id: group.people
-        state: 'home'
-      - condition: state
-        entity_id: input_boolean.announcements
-        state: 'on'
-    action:
-      - wait_template: "{{ not is_state('media_player.main_display','playing')}}"
-        timeout: '00:02:00'
-        continue_on_timeout: 'false'    
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.main_display
-          volume_level: 0.6
-      - delay: 00:00:02
-      - service: tts.google_say
-        data_template:
-          message: "The indoor CO2 level is high. It's at {{states('sensor.main_co2')}} parts per million"
-          entity_id: media_player.main_display
-      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
-        timeout: '00:02:00'
-      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
-        timeout: '00:02:00'
-      - service: media_player.turn_off
-        entity_id: media_player.main_display
+
   - alias: 'tts Earth Quake Alert'
     trigger:
       platform: geo_location
@@ -57,81 +26,7 @@ automation:
             - media_player.bathroom_speaker
             - media_player.bedroom_speaker
           message: "This is a {{ trigger.to_state.attributes.alert }} alert. An Earthquake with a magnitude of {{ trigger.to_state.attributes.magnitude }} has been detected {{ trigger.to_state.attributes.place }}"
-  - alias: tts Gas Leak
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.main_gas_detector
-        to: 'on'
-    action:
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.main_display
-          volume_level: 0.8
-      - delay: 00:00:02
-      - service: tts.google_say
-        data_template:
-          message: "Gas leak detected!"
-          entity_id: 
-            - media_player.main_display
-            - media_player.bathroom_speaker
-            - media_player.bedroom_speaker
-      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
-        timeout: '00:02:00'
-      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
-        timeout: '00:02:00'
-      - service: media_player.turn_off
-        entity_id: media_player.main_display
-  - alias: tts Gas Clear
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.main_gas_detector
-        to: 'off'
-    action:
-      - data:
-          entity_id: media_player.main_display
-          volume_level: 0.5
-        service: media_player.volume_set
-      - delay: 00:00:02
-      - service: tts.google_say
-        data_template:
-          entity_id: 
-            - media_player.main_display
-            - media_player.bathroom_speaker
-            - media_player.bedroom_speaker
-          message: "Gas no longer detected"
-      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
-        timeout: '00:02:00'
-      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
-        timeout: '00:02:00'
-      - service: media_player.turn_off
-        entity_id: media_player.main_display
-  - alias: tts Mail
-    trigger:
-      platform: state
-      entity_id: binary_sensor.mailbox_vibration
-      to: 'on'
-    condition:
-      condition: and
-      conditions:
-        - condition: time
-          after: '09:00:00'
-          before: '20:00:00'
-    action:
-      - data:
-          entity_id: media_player.main_display
-          volume_level: 0.6
-        service: media_player.volume_set
-      - delay: 00:00:02
-      - data_template:
-          entity_id: media_player.main_display
-          message: "You've got mail!"
-        service: tts.google_say
-      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
-        timeout: '00:02:00'
-      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
-        timeout: '00:02:00'
-      - service: media_player.turn_off
-        entity_id: media_player.main_display
+
   - alias: tts Welcome Home everyone
     trigger:
       - platform: state
@@ -161,6 +56,7 @@ automation:
         entity_id: media_player.main_display
       - service: input_boolean.turn_off
         entity_id: input_boolean.home_everyone
+
   - alias: tts Good Morning
     description: 'When good morning is switched on, run good morning routine'
     trigger:
