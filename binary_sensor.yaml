@@ -4,113 +4,113 @@
         value_template: >-
           {{ states('sensor.main_pir_battery') | int < 15 }}
         friendly_name: Main PIR Battery Low
-      bedroom_pir_lowbatt:
-        value_template: >-
-          {{ states('sensor.bedroom_pir_battery') | int < 15 }}
-        friendly_name: Bedroom PIR Battery Low
-      hallway_pir_lowbatt:
-        value_template: >-
-          {{ states('sensor.hallway_pir_battery') | int < 15 }}
-        friendly_name: Hallway PIR Battery Low
-      bathroom_pir_lowbatt:
-        value_template: >-
-          {{ states('sensor.bathroom_pir_battery') | int < 15 }}
-        friendly_name: Bathroom PIR Battery Low
-      front_multi_lowbatt:
-        value_template: >-
-          {{ states('sensor.front_multi_battery') | int < 15 }}
-        friendly_name: Patio Multi Battery Low
-      back_multi_lowbatt:
-        value_template: >-
-          {{ states('sensor.back_multi_battery') | int < 15 }}
-        friendly_name: Back Multi Battery Low
-      laundry_pir_lowbatt:
-        value_template: >-
-          {{ states('sensor.laundry_pir_battery') | int < 15 }}
-        friendly_name: Laundry PIR Battery Low
-      hallway_thermostat_lowbatt:
-        value_template: >-
-          {{ states('sensor.hallway_thermostat_battery') | int < 15 }}
-        friendly_name: Hallway Thermstat Battery Low
-      bedroom_closet_multi_lowbatt:
-        value_template: >-
-          {{ states('sensor.bedroom_closet_multi_battery') | int < 15 }}
-        friendly_name: Bedroom Closet Multi Battery Low
-      kitchen_multi_sensor_lowbatt:
-        value_template: >-
-          {{ states('sensor.kitchen_multi_battery') | int < 15 }}
-        friendly_name: Kitchen Multi Battery Low
-      patio_multi_lowbatt:
-        value_template: >-
-          {{ states('sensor.patio_multi_battery') | int < 15 }}
-        friendly_name: Patio Multi Battery Low
-      bathroom_climate_lowbatt:
-        value_template: >-
-          {{ states('sensor.bathroom_climate_battery') | int < 15 }}
-        friendly_name: Bathroom Climate Battery Low
-      main_front_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.main_front_window_battery') | int < 15 }}
-        friendly_name: Main Front Window Battery Low
-      main_side_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.main_side_window_battery') | int < 15 }}
-        friendly_name: Main Side Window Battery Low
-      kitchen_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.kitchen_window_battery') | int < 15 }}
-        friendly_name: Kitchen Window Battery Low
-      office_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.office_window_battery') | int < 15 }}
-        friendly_name: Office Window Battery Low
-      bathroom_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.bathroom_window_battery') | int < 15 }}
-        friendly_name: Bathroom Window Battery Low
-      bedroom_window_lowbatt:
-        value_template: >-
-          {{ states('sensor.bedroom_window_battery') | int < 15 }}
-        friendly_name: Bedroom Window Battery Low
-      mailbox_vibration_lowbatt:
-        value_template: >-
-          {{ states('sensor.mailbox_vibration_battery') | int < 15 }}
-        friendly_name: Mailbox Vibration Battery Low
-      bathroom_tamper:
-        value_template: >-
-          {{ states('sensor.bathroom_pir_burglar')|int == 3 }}
-        friendly_name: Bathroom Tamper
-        device_class: opening
       main_tamper:
         value_template: >-
           {{ states('sensor.main_pir_burglar')|int == 3 }}
         friendly_name: Main Tamper
-        device_class: opening      
-      hallway_tamper:
-        value_template: >-
-          {{ states('sensor.hallway_pir_burglar')|int == 3 }}
-        friendly_name: Hallway Tamper
         device_class: opening
+      main_tv:
+        friendly_name: Main TV
+        value_template: "{{not (is_state('media_player.nvidia_shield', 'off'))}}"
+      bedroom_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.bedroom_pir_battery') | int < 15 }}
+        friendly_name: Bedroom PIR Battery Low
+      bedroom_closet_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.bedroom_closet_pir_battery') | int < 15 }}
+        friendly_name: Bedroom Closet PIR Battery Low
+      bedroom_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.bedroom_window_battery') | int < 15 }}
+        friendly_name: Bedroom Window Battery Low
       bedroom_tamper:
         value_template: >-
           {{ states('sensor.bedroom_pir_burglar')|int == 3 }}
         friendly_name: Bedroom Tamper
         device_class: opening
-      laundry_tamper:
+      hallway_pir_lowbatt:
         value_template: >-
-          {{ states('sensor.laundry_pir_burglar')|int == 3 }}
-        friendly_name: Laundry Tamper
+          {{ states('sensor.hallway_pir_battery') | int < 15 }}
+        friendly_name: Hallway PIR Battery Low
+      hallway_thermostat_lowbatt:
+        value_template: >-
+          {{ states('sensor.hallway_thermostat_battery') | int < 15 }}
+        friendly_name: Hallway Thermstat Battery Low
+      hallway_tamper:
+        value_template: >-
+          {{ states('sensor.hallway_pir_burglar')|int == 3 }}
+        friendly_name: Hallway Tamper
         device_class: opening
+      bathroom_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.bathroom_pir_battery') | int < 15 }}
+        friendly_name: Bathroom PIR Battery Low
+      bathroom_climate_lowbatt:
+        value_template: >-
+          {{ states('sensor.bathroom_climate_battery') | int < 15 }}
+        friendly_name: Bathroom Climate Battery Low
+      bathroom_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.bathroom_window_battery') | int < 15 }}
+        friendly_name: Bathroom Window Battery Low
+      bathroom_tamper:
+        value_template: >-
+          {{ states('sensor.bathroom_pir_burglar')|int == 3 }}
+        friendly_name: Bathroom Tamper
+        device_class: opening
+      front_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.front_pir_battery') | int < 15 }}
+        friendly_name: Patio PIR Battery Low
+      front_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.front_window_battery') | int < 15 }}
+        friendly_name: Front Window Battery Low
       front_door_tamper:
         value_template: >-
           {{ states('sensor.front_door_burglar')|int == 3 }}
         friendly_name: Front Door Tamper
         device_class: opening
+      back_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.back_pir_battery') | int < 15 }}
+        friendly_name: Back PIR Battery Low
       back_door_tamper:
         value_template: >-
           {{ states('sensor.back_door_burglar')|int == 3 }}
         friendly_name: Back Door Tamper
         device_class: opening
-      main_tv:
-        friendly_name: Main TV
-        value_template: "{{not (is_state('media_player.nvidia_shield', 'off'))}}"
+      laundry_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.laundry_pir_battery') | int < 15 }}
+        friendly_name: Laundry PIR Battery Low
+      laundry_tamper:
+        value_template: >-
+          {{ states('sensor.laundry_pir_burglar')|int == 3 }}
+        friendly_name: Laundry Tamper
+        device_class: opening
+      kitchen_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.kitchen_pir_battery') | int < 15 }}
+        friendly_name: Kitchen PIR Battery Low
+      kitchen_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.kitchen_window_battery') | int < 15 }}
+        friendly_name: Kitchen Window Battery Low
+      patio_pir_lowbatt:
+        value_template: >-
+          {{ states('sensor.patio_pir_battery') | int < 15 }}
+        friendly_name: Patio PIR Battery Low
+      side_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.side_window_battery') | int < 15 }}
+        friendly_name: Side Window Battery Low
+      office_window_lowbatt:
+        value_template: >-
+          {{ states('sensor.office_window_battery') | int < 15 }}
+        friendly_name: Office Window Battery Low
+      mailbox_lowbatt:
+        value_template: >-
+          {{ states('sensor.mailbox_battery') | int < 15 }}
+        friendly_name: Mailbox Vibration Battery Low
