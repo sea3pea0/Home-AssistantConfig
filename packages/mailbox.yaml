@@ -1,0 +1,58 @@
+timer:
+  mailbox:
+    duration: '00:05:00'
+automation:
+  - alias: tts Mail
+    trigger:
+      platform: state
+      entity_id: binary_sensor.mailbox
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          after: '09:00:00'
+          before: '20:00:00'
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: timer.back_door
+              state: 'active'
+            - condition: state
+              entity_id: timer.people_home
+              state: 'active'
+    action:
+      - data:
+          entity_id: media_player.main_display
+          volume_level: 0.6
+        service: media_player.volume_set
+      - delay: 00:00:02
+      - data_template:
+          entity_id: media_player.main_display
+          message: "You've got mail!"
+        service: tts.google_say
+      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
+        timeout: '00:02:00'
+      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
+        timeout: '00:02:00'
+      - service: media_player.turn_off
+        entity_id: media_player.main_display
+
+  - alias: telegram Mail
+    trigger:
+      platform: state
+      entity_id: binary_sensor.mailbox
+      to: 'on'
+    condition:
+      condition: not
+      conditions:
+        - condition: state
+          entity_id: timer.back_door
+          state: 'active'
+        - condition: state
+          entity_id: timer.people_home
+          state: 'active'
+    action:
+      - service: notify.telegram
+        data:
+          message: "📬 You've Got Mail!"
