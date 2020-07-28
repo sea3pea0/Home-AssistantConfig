@@ -1,0 +1,232 @@
+alarm_control_panel:
+  - platform: manual
+    name: Alarm
+    code: !secret alarm_code
+
+input_text:
+
+  # Store Entity ID Responsible for Alarm Trigger
+  alarm_trigger:
+    name: Alarm Trigger
+    initial: None
+
+input_select:
+
+  camera_settings:
+    name: Camera Settings
+    options:
+      - Status
+      - Front Camera
+    initial: Status
+    icon: mdi:cog
+
+group:
+
+  # A group of binary_sensors used to determine if the home perimeter is secure
+  home_not_secure:
+    # control: hidden
+    name: Home Secure
+    entities:
+      - binary_sensor.back_door
+      - binary_sensor.front_door
+      - binary_sensor.main_front_window
+      - binary_sensor.main_side_window
+      - binary_sensor.kitchen_window
+      - binary_sensor.office_window
+      - binary_sensor.bathroom_window
+      - binary_sensor.bedroom_window
+
+folder_watcher:
+
+  # Watch Camera Folder for jpeg files
+  - folder: /share/camera
+    patterns:
+      - '*.jpg'
+
+
+automation:
+  # Image Folder Cleanup
+  - alias: Clean Image Folders
+    trigger:
+      platform: time_pattern
+      minutes: '/15'
+    action:
+      - service: shell_command.delete_old_images
+      - delay: '00:05:00'
+      - service: shell_command.delete_empty_folders
+
+  # Alarm Trigger
+  - alias: 'Alarm Trigger'
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.back_door
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.front_door
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bathroom_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bedroom_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.kitchen_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.front_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.side_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.office_window
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bathroom_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.bedroom_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.hallway_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+      - platform: state
+        entity_id: binary_sensor.kitchen_pir
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: alarm_control_panel.alarm
+        state: armed_away
+    action:
+      - service: input_text.set_value
+        entity_id: input_text.alarm_trigger
+        data_template:
+          entity_id: input_text.alarm_trigger
+          value: "{{ trigger.entity_id }}"
+      - service: alarm_control_panel.alarm_trigger
+        entity_id: alarm_control_panel.alarm
+
+  # Alarm Activate - Turn On Sirens & Lights
+  - alias: 'Alarm Activate - Siren & Light'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'triggered'
+    action:
+      - service: switch.turn_on
+        entity_id: switch.main_siren
+      - service: zha.warning_device_warn
+        data:
+          ieee: '00:0d:6f:00:14:f6:d1:8b'
+          mode: 1
+          strobe: 1
+          level: 2
+          duration: 300
+          duty_cycle: 10
+          intensity: 2
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.police_effect
+
+# Alarm Deactivate
+  - alias: 'Alarm Disarm/Deactivate - Siren & Light'
+    trigger:
+      - platform: state
+        entity_id: alarm_control_panel.alarm
+        to: 'disarmed'
+    action:
+      - service: switch.turn_off
+        entity_id: switch.main_siren
+      - service: zha.warning_device_warn
+        data:
+          ieee: '00:0d:6f:00:14:f6:d1:8b'
+          mode: 0
+          strobe: 0
+          level: 2
+          duration: 300
+          duty_cycle: 10
+          intensity: 2
+      - service: light.turn_off
+        entity_id: light.main
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'none'
+
+  # Alarm Disarm - People Arriving
+  - alias: People Arrive - Disarm Alarm
+    trigger:
+      - platform: state
+        entity_id: !secret person_1
+        to: "home"
+        for: '00:00:35'
+      - platform: state
+        entity_id: !secret person_2
+        to: "home"
+        for: '00:00:35'
+    condition:
+      - condition: state
+        entity_id: alarm_control_panel.alarm
+        state:  'armed_away'
+    action:
+      - service: alarm_control_panel.alarm_disarm
+        data:
+          entity_id: alarm_control_panel.alarm
+          code: !secret alarm_code
+
+  # CP Home
+  - alias: CP Home
+    trigger:
+      platform: state
+      entity_id: person.cp
+      to: 'home'
+    action:
+      service: timer.start
+      entity_id: timer.people_home
+
+  # Yulia Home
+  - alias: Yulia Home
+    trigger:
+      platform: state
+      entity_id: person.yulia
+      to: 'home'
+    action:
+      service: timer.start
+      entity_id: timer.people_home
+
+  # Away Mode
+  - alias: Away Mode Settings
+    trigger:
+      - platform: state
+        entity_id: group.people
+        to: "not_home"
+    action:
+      # - service: switch.turn_off
+      #   entity_id: switch.home_mode
+      - service: switch.turn_off
+        entity_id: switch.fan
+      - service: homeassistant.turn_off
+        entity_id: group.all_lights
+      - service: climate.turn_off
+        entity_id: climate.thermostat_hallway_mode
+
+  # Back Door Timer
+  - alias: back door timer
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.back_door
+        to: 'on'
+    action:
+      - service: timer.start
+        data:
+          entity_id: timer.back_door
+
+shell_command:
+
+  # Image Folder Cleanup Commands
+  delete_old_images: find /share/camera/* -mindepth 4 -mmin +15 -exec rm {} \;
+  delete_empty_folders: find /share/camera -mindepth 2 -type d -exec rmdir {} \;
