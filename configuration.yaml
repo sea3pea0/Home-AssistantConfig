@@ -55,6 +55,7 @@ script: !include scripts.yaml
 sensor: !include sensor.yaml
 binary_sensor: !include binary_sensor.yaml       
 switch: !include switch.yaml
+timer: !include timer.yaml
 # shell_command: !include shell_command.yaml
 input_select: !include input_select.yaml
 # input_number: !include input_number.yaml
@@ -95,6 +96,8 @@ media_player:
     name: "NVidia Shield"
     adb_server_ip: 127.0.0.1
     adb_server_port: !secret adb_port
+    apps:
+      com.plexapp.android: Plex
 
   - platform: androidtv
     host: !secret bedroom_firestick_ip
@@ -150,24 +153,7 @@ system_log:
 
 python_script:
 
-# hacs:
-#   token: !secret hacs_github_token
-#   appdaemon: true
-#   options:
-#     country: US
-#     experimental: true
-
 zeroconf:
-
-# lovelace:
-  # mode: yaml
-  # resources:
-  #   - type: module
-  #     url: /hacsfiles/weather-card/weather-card.js
-  #   - url: /hacsfiles/lovelace-auto-entities/auto-entities.js
-  #     type: module
-  #   - url: /hacsfiles/air-visual-card/air-visual-card.js
-  #     type: module
 
 geo_location:
   - platform: usgs_earthquakes_feed
@@ -183,3 +169,5 @@ mobile_app:
 map:
 
 ssdp:
+
+zha_map:
