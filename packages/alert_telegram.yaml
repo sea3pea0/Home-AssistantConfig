@@ -1,6 +1,6 @@
 alert:
   gas_leak:
-    name: "Gas Leak Detected"
+    name: "Main Gas Leak Alert"
     message: "⛽️ Gas leak detected!"
     done_message: "👌 Gas no longer detected"
     entity_id: binary_sensor.main_gas_detector
@@ -11,25 +11,10 @@ alert:
     notifiers:
       - telegram
 
-  co2_high:
-    name: "Indoor CO2 Level High"
-    message: "⚠️ Indoor CO2 level is High ({{states('sensor.main_co2')}}ppm)"
-    entity_id: binary_sensor.co2_high
-    state: 'on'
-    repeat:
-      - 1
-      - 15
-    can_acknowledge: true
-    skip_first: true
-    notifiers:
-      - telegram
-    data:
-      inline_keyboard:
-        - 'Fan On:/fan_on, Dismiss (Turn Off Alert):/dismiss'
-
   ups_status:
-    name: "\U000026A1 AC Power Disconnected"
-    done_message: "\U000026A1 AC Power Restored"
+    name: Main UPS Power Loss Alert
+    message: "\U000026A1 AC Power Disconnected"
+    done_message: "\U000026A1 AC Power Restorsed"
     entity_id: sensor.myups_status_data
     state: 'OB'
     repeat: 
@@ -44,16 +29,6 @@ alert:
       - telegram
 
 automation:
-
-  - alias: telegram Mail
-    trigger:
-      platform: state
-      entity_id: binary_sensor.mailbox_vibration
-      to: 'on'
-    action:
-      - service: notify.telegram
-        data:
-          message: "📬 You've Got Mail!"
 
   # Commands
 
