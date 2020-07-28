@@ -72,23 +72,23 @@ sensor.nut_status:
 group.main_rgbw:
   icon: mdi:led-strip
 group.cp:
-  entity_picture: !secret user_1_picture
+  entity_picture: /local/seasmall.png
 group.yulia:
-  entity_picture: !secret user_2_picture
+  entity_picture: /local/belkasmall.png
 group.seaprius:
   entity_picture: /local/seaprius.png
 group.people:
   icon: mdi:account-multiple
 device_tracker.leyah_pixel2xl:
   name: Pixel 2 XL GPS
-  picture: !secret user_2_picture
+  picture: /local/belkasmall.png
 device_tracker.sea3pea0_pixel3a:
   name: Pixel 3a GPS
-  picture: !secret user_1_picture
+  picture: /local/seasmall.png
 person.cp:
-  entity_picture: !secret user_1_picture
+  entity_picture: /local/seasmall.png
 person.yulia:
-  entity_picture: !secret user_2_picture
+  entity_picture: /local/belkasmall.png
 binary_sensor.patio_pir:
   device_class: motion
 switch.main_fan:
@@ -126,18 +126,28 @@ binary_sensor.bedroom_window:
 switch.main_siren:
   icon: mdi:bell
 device_tracker.pixel_3a:
-  picture: !secret user_1_picture
+  picture: /local/seasmall.png
 device_tracker.pixel_2_xl:
-  picture: !secret user_2_picture
+  picture: /local/belkasmall.png
 switch.coffee_machine_switch:
   icon: mdi:coffee
 sensor.pixel_2_xl_wifi_connection:
-  picture: !secret user_2_picture
+  picture: /local/belkasmall.png
 device_tracker.pixel_2xl_wifi:
-  entity_picture: !secret user_2_picture
+  entity_picture: /local/belkasmall.png
 device_tracker.pixel_3a_wifi:
-  entity_picture: !secret user_2_picture
+  entity_picture: /local/belkasmall.png
 device_tracker.pixel_3a_gps:
-  entity_picture: !secret user_1_picture
+  entity_picture: /local/seasmall.png
 device_tracker.pixel_2xl_gps:
-  entity_picture: !secret user_2_picture
+  entity_picture: /local/belkasmall.png
+binary_sensor.front_porch_camera_motion:
+  icon: mdi:cctv
+binary_sensor.side_window:
+  device_class: window
+binary_sensor.front_window:
+  device_class: window
+binary_sensor.mailbox:
+  icon: mdi:mailbox
+image_processing.tensorflow_front_porch_motion:
+  friendly_name: Front Porch Camera AI Objects
