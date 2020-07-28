@@ -20,8 +20,8 @@ automation:
   - alias: Time Coffee 4 Good Morning
     description: 'When coffee machine is on switch good morning on'
     trigger:
-    - above: '150'
-      entity_id: sensor.coffee_machine_power
+    - above: 150
+      entity_id: sensor.espresso_maker_power
       platform: numeric_state
     condition:
       condition: and
