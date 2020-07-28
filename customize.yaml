@@ -92,7 +92,6 @@ person.yulia:
 binary_sensor.patio_pir:
   device_class: motion
 switch.main_fan:
-  device_class: switch
   icon: mdi:fan
 sensor.bedroom_closet_luminance:
   device_class: illuminance
