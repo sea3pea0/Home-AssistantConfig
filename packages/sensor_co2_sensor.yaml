@@ -1,9 +1,64 @@
+alert:
+
+  co2_high:
+    name: "Main High CO2 Alert"
+    message: "⚠️ Indoor CO2 level is High ({{states('sensor.main_co2')}}ppm)"
+    entity_id: binary_sensor.co2_high
+    state: 'on'
+    repeat:
+      - 1
+      - 15
+    can_acknowledge: true
+    skip_first: true
+    notifiers:
+      - telegram
+    data:
+      inline_keyboard:
+        - 'Fan On:/fan_on, Dismiss (Turn Off Alert):/dismiss'
+
 binary_sensor:
   - platform: template
     sensors:
       co2_high:
         value_template: "{{ states('sensor.main_co2')|int >= 3000 }}"
+
 automation:
+
+  # TTS High CO2 Alert
+  - alias: tts CO2 High
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.co2_high
+        to: 'on'
+        for: 00:01:00
+    condition:
+      - condition: state
+        entity_id: group.people
+        state: 'home'
+      - condition: state
+        entity_id: input_boolean.announcements
+        state: 'on'
+    action:
+      - wait_template: "{{ not is_state('media_player.main_display','playing')}}"
+        timeout: '00:02:00'
+        continue_on_timeout: false   
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.main_display
+          volume_level: 0.6
+      - delay: 00:00:02
+      - service: tts.google_say
+        data_template:
+          message: "The indoor CO2 level is high. It's at {{states('sensor.main_co2')}} parts per million"
+          entity_id: media_player.main_display
+      - wait_template: "{{ is_state('media_player.main_display','playing')}}"
+        timeout: '00:02:00'
+      - wait_template: "{{ is_state('media_player.main_display','idle')}}"
+        timeout: '00:02:00'
+      - service: media_player.turn_off
+        entity_id: media_player.main_display
+
+  # NUC LED Ring CO2 Alerts
   - alias: CO2 Level High
     trigger:
       - platform: numeric_state
