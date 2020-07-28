@@ -30,3 +30,5 @@
     icon: mdi:led-strip-variant
   home_everyone:
     name: Everyone Home
+  notification_schedule:
+    name: Notification Scheduling
