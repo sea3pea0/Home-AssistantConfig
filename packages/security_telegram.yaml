@@ -171,8 +171,7 @@ automation:
     trigger:
       - platform: state
         entity_id: alarm_control_panel.alarm
-        to: 'pending'
-        from: 'disarmed'
+        to: 'arming'
     condition:
       - condition: state
         entity_id: input_boolean.notifications
