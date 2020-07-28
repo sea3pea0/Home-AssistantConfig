@@ -7,7 +7,7 @@ homeassistant:
 
     - type: homeassistant
 
-  whitelist_external_dirs:
+  allowlist_external_dirs:
     - /tmp
     - /share/scripts
     - /share/camera
