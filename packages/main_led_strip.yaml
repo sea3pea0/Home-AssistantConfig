@@ -1,0 +1,834 @@
+# Automations
+
+automation:
+
+# Automations for turning main light OFF based on time and sensors
+
+  - alias: Main Auto-Off
+    trigger:
+      - platform: state
+        entity_id: media_player.nvidia_shield
+        to: "off"
+        for:
+          minutes: 5
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: "off"
+        for:
+          minutes: 5
+    condition:
+      condition: and
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('light.main', 'on') or not (is_state('input_select.main_effect', 'none')) }}"
+        - condition: template
+          value_template: "{{states('sensor.desktop_uptime') == 'unknown'}}"
+        - condition: state
+          entity_id: binary_sensor.main_pir
+          state: 'off'
+          for:
+            minutes: 5
+        - condition: or
+          conditions:
+            - condition: state
+              entity_id: media_player.nvidia_shield
+              state: 'off'
+              for:
+                minutes: 5
+    action:
+      - service: light.turn_off
+        entity_id: light.main
+
+  - alias: Main Effect Off
+    trigger:
+      - platform: state
+        entity_id: light.main
+        to: 'off'
+    action:
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: "none"
+
+# Automations for turning main light ON based on time and sensors
+
+  - alias: Main Auto On 1 Midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '00:00:00'
+          before: '02:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 10
+          white_value: 0
+
+  - alias: Main Auto On 2 AM
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '02:00:00'
+          before: '08:00:00'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          below: 1
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 5
+          white_value: 0
+
+  - alias: Main Auto On 4 Dawn
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '02:00:00'
+          before: '08:00:00'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 0
+          below: 100
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 50 
+          white_value: 0
+
+  - alias: Main Auto On 5 Morning
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          above: 100
+        - condition: time
+          after: '05:00:00'
+          before: '08:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 100
+          white_value: 0
+
+  - alias: Main Auto On 6 Morning late
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '08:00:00'
+          before: '09:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 80
+          white_value: 0
+
+  - alias: Main Auto On 7 Morning later
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '09:00:00'
+          before: '09:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 60
+          white_value: 0
+
+  - alias: Main Auto On 8 day
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '09:30:00'
+          before: '10:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 40
+          white_value: 0
+
+  - alias: main auto on 10 eve
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: numeric_state
+          entity_id: sensor.front_luminance
+          below: 60
+        - condition: time
+          after: '16:00:00'
+          before: '19:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: yellow
+          brightness_pct: 100
+          white_value: 255
+
+  - alias: Main Auto On 11 Night
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '19:30:00'
+          before: '20:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 90
+          white_value: 122
+
+  - alias: Main Auto On 11.5 Night2
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '20:30:00'
+          before: '21:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 75
+          white_value: 61
+
+  - alias: Main Auto On 12 Late
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '21:30:00'
+          before: '22:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 55
+          white_value: 0
+
+  - alias: Main Auto On 13 Later
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '22:30:00'
+          before: '23:30:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 40
+          white_value: 0
+
+  - alias: Main Auto On 14 almost midnight
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.main_pir
+        to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'off'
+        - condition: state
+          entity_id: input_select.main_effect
+          state: 'none'
+        - condition: time
+          after: '23:30:00'
+          before: '00:00:00'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 25
+          white_value: 0
+
+## LED Effects
+  - alias: Main Effect Aura
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Aura'
+      - platform: state
+        entity_id: input_boolean.aura_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.aura_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Aura'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 9
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Fire
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Fire'
+      - platform: state
+        entity_id: input_boolean.fire_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.fire_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Fire'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 6
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.aura_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect None
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'none'
+      - platform: state
+        entity_id: input_boolean.none_effect
+        to: 'on' 
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.none_effect
+      - service: zwave.set_config_parameter
+        data:
+          node_id: 2
+          parameter: 72
+          value: 1
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.aura_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.storm_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Police
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Police'
+      - platform: state
+        entity_id: input_boolean.police_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.police_effect
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: 'Police'
+      - service: zwave.set_config_parameter
+        data:
+          node_id: 2
+          parameter: 72
+          value: 10
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.aura_effect
+  - alias: Main Effect Rainbow
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Rainbow'
+      - platform: state
+        entity_id: input_boolean.rainbow_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.rainbow_effect
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.main_effect
+          option: 'Rainbow'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 8
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.storm_effect
+          - input_boolean.aura_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+  - alias: Main Effect Storm
+    trigger:
+      - platform: state
+        entity_id: input_select.main_effect
+        to: 'Storm'
+      - platform: state
+        entity_id: input_boolean.storm_effect
+        to: 'on'  
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.storm_effect
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.main_effect
+          option: 'Storm'
+      - data:
+          node_id: 2
+          parameter: 72
+          value: 7
+        service: zwave.set_config_parameter
+      - service: input_boolean.turn_off
+        entity_id: 
+          - input_boolean.fire_effect
+          - input_boolean.aura_effect
+          - input_boolean.rainbow_effect
+          - input_boolean.none_effect
+          - input_boolean.police_effect
+
+# Main LED Dimmer Sync
+
+  - alias: Main Dimmer Off - Sync
+    trigger:
+      - platform: state
+        entity_id: light.main_dimmer
+        to: 'off'
+    condition:
+      - condition: state
+        entity_id: light.main_rgbw
+        state: 'on'
+    action:
+      - data:
+          entity_id: light.main_rgbw
+        service: light.turn_off
+
+  - alias: Main Dimmer On - Sync
+    trigger:
+      - platform: state
+        entity_id: light.main_dimmer
+        to: 'on'
+    condition:
+      - condition: state
+        entity_id: light.main_rgbw
+        state: 'off'
+    action:
+      - data:
+          entity_id: light.main_rgbw
+          brightness: 255
+        service: light.turn_on
+      - data:
+          entity_id: light.main_rgbw
+        service: zwave.refresh_entity
+
+# Time Based Automations
+
+  - alias: Time main 1 midnight
+    description: Adjust main light at midnight
+    trigger:
+    - at: '00:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: red
+        brightness_pct: 10
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 2 AM
+    description: Adjust main light at AM
+    trigger:
+    - at: '01:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: red
+        brightness_pct: 5
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 4 dawn
+    description: Adjust main light at dawn
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.front_luminance
+      above: 0
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+        - condition: time
+          after: '02:00:00'
+          before: '07:00:00'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: orange
+        brightness_pct: 50
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 5 morning
+    description: Adjust main light at morning
+    trigger:
+    - at: '07:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: yellow
+        brightness_pct: 100
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 6 morning late
+    description: Adjust main ambient light at morning late
+    trigger:
+    - at: '08:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: yellow
+        brightness_pct: 80
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 7 morning later
+    description: Adjust main ambient light at morning later
+    trigger:
+    - at: '09:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: yellow
+        brightness_pct: 60
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 8 day
+    description: Adjust main light at day
+    trigger:
+    - at: '09:30:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+    - data:
+        entity_id: light.main
+        color_name: yellow
+        brightness_pct: 40
+        white_value: 0
+      service: light.turn_on
+
+  - alias: Time main 8.5 off
+    description: Adjust main ambient light at night
+    trigger:
+    - at: '10:00:00'
+      platform: time
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: light.main
+          state: 'on'
+    action:
+      - service: light.turn_off
+        entity_id: light.main
+      - service: input_select.select_option
+        entity_id: input_select.main_effect
+        data:
+          entity_id: input_select.main_effect
+          option: "none"
+
+  - alias: Time main 11 night
+    description: Adjust main ambient light at night
+    trigger:
+    - at: '19:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.main
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 90
+          white_value: 122
+
+  - alias: Time main 11.5 night2
+    description: Adjust main light at night2
+    trigger:
+    - at: '20:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.main
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 75
+          white_value: 61
+
+  - alias: Time main 12 late
+    description: Adjust main light at night
+    trigger:
+    - at: '21:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.main
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: orange
+          brightness_pct: 55
+          white_value: 0
+
+  - alias: Time main 13 later
+    description: Adjust main ambient light at night
+    trigger:
+    - at: '22:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.main
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 40
+          white_value: 0
+
+  - alias: Time main 14 almost midnight
+    description: Adjust main ambient light at night
+    trigger:
+    - at: '23:30:00'
+      platform: time
+    condition:
+    - condition: state
+      entity_id: light.main
+      state: 'on'
+    action:
+      - service: light.turn_on
+        entity_id: light.main
+        data:
+          color_name: red
+          brightness_pct: 25
+          white_value: 0

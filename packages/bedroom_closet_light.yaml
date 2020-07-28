@@ -22,7 +22,7 @@ automation:
         entity_id: binary_sensor.bedroom_closet_pir
         to: 'off'
         for:
-          minutes: '1'
+          minutes: 1
     action:
       - data:
           entity_id: light.bedroom_closet
