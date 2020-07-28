@@ -1,0 +1,510 @@
+camera:
+  # Front Porch Camera
+  - platform: generic
+    name: Front Porch
+    still_image_url: !secret front_porch_still_url
+    stream_source: !secret front_porch_stream_url
+
+  # Front Porch - Local File Camera for Imagae Processing
+  - platform: local_file
+    file_path: /share/camera/front_porch.jpg
+    name: Front Porch Motion
+
+image_processing:
+
+  # Front Porch Camera
+  - platform: tensorflow
+    scan_interval: 10000
+    confidence: 98
+    source:
+      - entity_id: camera.front_porch_motion
+    model:
+      graph: /config/tensorflow/frozen_inference_graph.pb
+      categories:
+        - person
+    
+
+input_boolean:
+
+  front_porch_camera_motion:
+    name: Front Porch Camera Motion
+    initial: off
+  front_porch_camera_person:
+    name: Front Porch Camera Person
+    initial: off
+  front_porch_camera_notify:
+    name: Front Porch Camera Notify
+  front_porch_camera_tg_home:
+    name: Front Porch Camera Notify TG Home
+  front_porch_camera_tg_away:
+    name: Front Porch Camera Notify TG Away
+  front_porch_camera_tts:
+    name: Front Porch Camera Notify TTS
+  front_porch_camera_atv:
+    name: Front Porch Camera Notify ATV
+  front_porch_camera_tts_schedule:
+    name: Front Porch TTS Camera Schedule
+  front_porch_camera_tg_schedule_home:
+    name: Front Porch Camera TG Schedule Home
+  front_porch_camera_tg_schedule_away:
+    name: Front Porch Camera TG Schedule Away
+  front_porch_camera_atv_schedule:
+    name: Front Porch Camera ATV Schedule
+  front_porch_camera_notification_schedule:
+    name: Front Porch Camera Notification Schedule
+
+input_text:
+
+  front_porch_camera_motion_path:
+    name: Front Porch Camera Motion Path
+  front_porch_camera_motion_time:
+    name: Front Porch Camera Motion Time
+  front_porch_camera_person_path:
+    name: Front Porch Camera Person Path
+  front_porch_camera_person_time:
+    name: Front Porch Camera Person Time
+
+input_number:
+
+  front_porch_camera_motion_interval:
+    name: Front Porch Camera Motion Interval
+    min: 5
+    max: 6000
+    step: 1
+    mode: box
+  front_porch_camera_person_interval:
+    name: Front Porch Camera Person Interval
+    min: 5
+    max: 6000
+    mode: box
+        
+input_datetime:
+        
+  front_porch_camera_tg_ontime:
+    name: Front Porch TG On time
+    has_date: false
+    has_time: true
+
+  front_porch_camera_tg_offtime:
+    name: Front Porch TG Offtime
+    has_date: false
+    has_time: true
+
+  front_porch_camera_tts_ontime:
+    name: Front Porch TTS On time
+    has_date: false
+    has_time: true
+
+  front_porch_camera_tts_offtime:
+    name: Front Porch TTS Offtime
+    has_date: false
+    has_time: true
+
+  front_porch_camera_atv_ontime:
+    name: Front Porch ATV On time
+    has_date: false
+    has_time: true
+
+  front_porch_camera_atv_offtime:
+    name: Front Porch ATV Offtime
+    has_date: false
+    has_time: true
+
+binary_sensor:
+
+  - platform: template
+    sensors:
+
+    # Front Porch Camera - binary_sensors receive input from input_booleans defined in this file
+      front_porch_camera_person:
+        friendly_name: Front Porch Camera Person
+        value_template: "{{is_state('input_boolean.front_porch_camera_person', 'on')}}"
+        device_class: motion
+      front_porch_camera_motion:
+        friendly_name: Front Porch Camera Motion
+        value_template: "{{is_state('input_boolean.front_porch_camera_motion', 'on')}}"
+        device_class: motion
+      front_porch_camera_notify_tg:
+        friendly_name: Front Porch Telegram
+        value_template: "{{is_state('input_boolean.front_porch_camera_tg_home', 'on')}}"
+      front_porch_camera_notify_tts:
+        friendly_name: Front Porch TTS
+        value_template: "{{is_state('input_boolean.front_porch_camera_tts', 'on')}}"
+      front_porch_camera_tg_schedule:
+        friendly_name: Front Porch Telegram Schedule
+        value_template: "{{is_state('input_boolean.front_porch_camera_tg_schedule_home', 'on')}}"
+      front_porch_camera_tts_schedule:
+        friendly_name: Front Porch TTS Schedule
+        value_template: "{{is_state('input_boolean.front_porch_camera_tts_schedule', 'on')}}"
+
+timer:
+
+  front_porch_camera_motion:
+    duration: '00:00:05'
+  front_porch_camera_person:
+    duration: '00:00:05'
+
+automation:
+
+  # Front Porch Camera Motion Trigger
+  - alias: Front Porch Camera Motion Trigger
+    trigger:
+      platform: event
+      event_type: folder_watcher
+      event_data:
+        event_type: created
+    condition:
+      condition: and
+      conditions: 
+        - condition: template
+          value_template: "{{'.jpg' in trigger.event.data.file and 'front_porch' in trigger.event.data.path }}"
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_notify
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.front_porch_camera_motion
+          state: 'off'
+    action:
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_camera_motion_time
+          value: "{{ trigger.event.time_fired|as_timestamp()|timestamp_custom('%H:%M:%S') }}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_camera_motion_path
+          value: "{{ trigger.event.data.path }}"
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.front_porch_camera_motion
+
+  # Front Porch Camera Person Detection
+  - alias: Front Porch Camera Person Detection
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_motion
+      to: 'on'
+    condition:
+      condition: and
+      conditions: 
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_notify
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.front_porch_camera_person
+          state: 'off'
+    action:
+      - service: local_file.update_file_path
+        data_template:
+          entity_id: camera.front_porch_motion
+          file_path: "{{ states('input_text.front_porch_camera_motion_path') }}"
+      - wait_template: "{{ state_attr('camera.front_porch_motion', 'file_path') == states('input_text.front_porch_camera_motion_path') }}"
+      - service: image_processing.scan
+        data_template:
+          entity_id: image_processing.tensorflow_front_porch_motion
+      - delay: '00:00:01'
+      - condition: template
+        value_template: "{{ states('image_processing.tensorflow_front_porch_motion') | int >= 1 }}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_camera_person_time
+          value: "{{ states('input_text.front_porch_camera_motion_time') }}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: input_text.front_porch_camera_person_path
+          value: "{{ states('input_text.front_porch_camera_motion_path') }}"
+      - service: input_boolean.turn_on
+        data_template:
+          entity_id: input_boolean.front_porch_camera_person
+
+  - alias: Front Porch Camera Motion Timer Start
+    initial_state: on
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_motion
+      to: 'on'
+    action:
+      - service: timer.start
+        data_template:
+          entity_id: timer.front_porch_camera_motion
+          duration:
+            seconds: "{{ states('input_number.front_porch_camera_motion_interval') | int }}"
+
+  - alias: Front Porch Camera Motion Timer Finish
+    trigger:
+      platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.front_porch_camera_motion
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_motion
+
+  - alias: Front Porch Person Timer Start
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_person
+      to: 'on'
+    action:
+      - service: timer.start
+        data_template:
+          entity_id: timer.front_porch_camera_person
+          duration:
+            seconds: "{{ states('input_number.front_porch_camera_person_interval') | int }}"
+
+  - alias: Front Porch Camera Person Timer Finish
+    trigger:
+      platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.front_porch_camera_person
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_person
+
+  - alias: Front Porch Camera TG Ontime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_tg_ontime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_tg_schedule_home
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.notification_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.front_porch_camera_tg_home
+
+  - alias: Front Porch Camera TG Offtime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_tg_offtime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_tg_schedule_home
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.notification_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_tg_home
+
+  - alias: Front Porch Camera TG Reset if Ontime and OffTime are the same
+    trigger:
+      platform: template
+      value_template: "{{ states('input_datetime.front_porch_camera_tg_ontime') == states('input_datetime.front_porch_camera_tg_offtime') }}"
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_tg_schedule_home
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_tg_ontime
+        data:
+          time: '17:00:00'
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_tg_offtime
+        data:
+          time: '09:00:00'
+
+  - alias: Front Porch Camera TTS Ontime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_tts_ontime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_tts_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.front_porch_camera_tts
+
+  - alias: Front Porch Camera TTS Offtime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_tts_offtime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_tts_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_tts
+
+  - alias: Front Porch Camera TTS Reset if Ontime and OffTime are the same
+    trigger:
+      platform: template
+      value_template: "{{ states('input_datetime.front_porch_camera_tts_ontime') == states('input_datetime.front_porch_camera_tts_offtime') }}"
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_tts_schedule
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_tts_ontime
+        data:
+          time: '17:00:00'
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_tts_offtime
+        data:
+          time: '09:00:00'
+
+  - alias: Front Porch Camera ATV Ontime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_atv_ontime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_atv_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.front_porch_camera_atv
+
+  - alias: Front Porch Camera ATV Offtime
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == states('input_datetime.front_porch_camera_atv_offtime')|truncate(5,true,'',0) }}"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_atv_schedule
+          state: 'on'
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_atv
+
+  - alias: Front Porch Camera ATV Reset if Ontime and OffTime are the same
+    trigger:
+      platform: template
+      value_template: "{{ states('input_datetime.front_porch_camera_atv_ontime') == states('input_datetime.front_porch_camera_atv_offtime') }}"
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_porch_camera_atv_schedule
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_atv_ontime
+        data:
+          time: '17:00:00'
+      - service: input_datetime.set_datetime
+        entity_id: input_datetime.front_porch_camera_atv_offtime
+        data:
+          time: '09:00:00'
+
+  - alias: Front Porch Telegram Alert
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_notify
+          state: 'on'
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ is_state('input_boolean.front_porch_camera_tg_home', 'on') and is_state('group.people', 'home') }}"
+            - condition: template
+              value_template: "{{ is_state('input_boolean.front_porch_camera_tg_away', 'on') and is_state('group.people', 'not_home') }}"
+    action:
+      - service: telegram_bot.send_photo
+        data_template:
+          file: "{{ states('input_text.front_porch_camera_person_path') }}"
+          caption: "🚶‍♂️ {{ states('input_text.front_porch_camera_person_time') }} 📸 Front Porch"
+          target: !secret group1
+          timeout: 30
+
+  - alias: Front Porch Shield Alert
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.main_tv
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_atv
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_notify
+          state: 'on'
+    action:
+      - service: notify.shield_living_room
+        data_template:
+          message: "🚶‍♂️ Person Detected in Front"
+          data:
+            color: black
+            position: top-right
+            fontsize: small
+            duration: 20
+            # interrupt: true
+            transparency: 0%
+            file:
+              path: "{{ states('input_text.front_porch_camera_person_path') }}"
+
+  - alias: Front Porch TTS Alert
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_porch_camera_person
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.notifications
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_tts
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.front_porch_camera_notify
+          state: 'on'
+    action:
+      - service: tts.google_say
+        data:
+          entity_id: media_player.inside
+          message: "Person detected on Front Porch"
+
+  - alias: Front Porch Notifications Off
+    trigger:
+      platform: state
+      entity_id: input_boolean.front_porch_camera_notify
+      to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        entity_id:
+          - input_boolean.front_porch_camera_tg_home
+          - input_boolean.front_porch_camera_tts
+          - input_boolean.front_porch_camera_tg_schedule_home
+          - input_boolean.front_porch_camera_tts_schedule
+
+  - alias: Front Porch Schedule Off
+    trigger:
+      platform: state
+      entity_id: input_boolean.front_porch_camera_notification_schedule
+      to: 'off'
+    action:
+      - service: input_boolean.turn_off
+        entity_id:
+          - input_boolean.front_porch_camera_tg_schedule_home
+          - input_boolean.front_porch_camera_tts_schedule
